@@ -1,20 +1,38 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plantilla de Publicación</title>
-    <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
+    <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../feed.css">
-    <script src="./feed.js"></script>
+    <script src="./Post.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
+
 </head>
-
-<body class="bg-white">
-
+<body>
+    <template id="comments">
+        <div class="w-full mb-4 max-w-2xl p-6 rounded-2xl shadow-lg">
+            <div class="flex items-center mb-6">
+                <div>
+                    <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="w-16 h-16 object-cover rounded-full">
+                </div>
+                <div class="ml-4">
+                    <h2 class="font-semibold text-lg">NOMBRE_DEL_USUARIO</h2>
+                    <p class="text-sm text-gray-500">@USUARIO</p>
+                </div>
+            </div>
+            <p id="comment-content" class="text-gray-700 mb-4">CONTENIDO_DEL_COMENTARIO</p>
+            <div class="flex items-center justify-between text-gray-700">
+                <div class="flex items-center gap-3 cursor-pointer hover:text-red-500">
+                    <ion-icon name="heart-outline" class="text-blue-900 text-2xl hover:text-red-500"></ion-icon>
+                    <p id="likes-count">NUM_LIKES</p>
+                </div>
+            </div>
+        </div>
+    </template>
+    
     <template id="post-template">
-        <div class="flex  justify-center items-center py-1 bg-blue-150 rounded-2xl">
+        <div class="flex flex-col justify-center items-center py-1 bg-blue-150 rounded-2xl">
             <div class="w-full mb-4 max-w-2xl  p-6 rounded-2xl shadow-lg">
                 <div class="flex items-center mb-6">
                     <div>
@@ -46,38 +64,6 @@
         </div>
     </template>
 
-    <template id="template-1">
-        <div class="w-full max-w-xl mx-auto mt-1">
-            <div class=" p-2 rounded-lg ">
-                <div class="mt-2 flex justify-between">
-                    <div class="flex flex-col justify-start space-x-2">
-                        <span class="text-lg font-bold" id="template1-name">#Emilia Perez</span>
-                        <p class="text-gray-500 text-sm" id="template1-posts">+20k publicaciones</p>
-                    </div>
-                    <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="template-2">
-        <div class="flex justify-between items-center rounded-2xl shadow-lg p-6 space-x-6">
-            <div class="flex items-center">
-                <div>
-                    <img src="IMAGEN_DE_PERFIL" alt="User Profile" class="w-16 h-16 object-cover rounded-full"
-                        id="template2-profile-img">
-                </div>
-                <div class="ml-4">
-                    <h2 class="font-semibold text-lg" id="template2-name">NOMBRE_DEL_USUARIO</h2>
-                    <p class="text-sm text-gray-500" id="template2-handle">@USUARIO</p>
-                </div>
-            </div>
-            <div class="flex items-center">
-                <button class="bg-blue-500 hover:bg-blue-600 cursor-pointer p-2 rounded-xl text-white">Seguir</button>
-            </div>
-        </div>
-
-    </template>
 
     <div>
         <header>
@@ -109,20 +95,9 @@
             </nav>
         </aside>
         <main class="flex-1 p-4">
-            <div class="p-6 mb-4 border rounded-lg shadow-lg max-w-md mx-auto bg-white">
-                <div class="flex items-center space-x-4">
-                    <div class="rounded-full bg-gray-300 w-12 h-12">
-                        <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp"
-                            alt="User profile" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <textarea id="openModal"
-                        class="w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows="1" placeholder="What's on your mind?"></textarea>
-                </div>
-            </div>
+            
 
             <div id="post-container">
-                <h1 class="mb-4"> Publicaciones</h1>
             </div>
         </main>
         <aside class="w-auto p-4 ">
@@ -136,14 +111,5 @@
             </div>
         </aside>
     </div>
-
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Este es el contenido del modal.</p>
-        </div>
-
-
 </body>
-
 </html>

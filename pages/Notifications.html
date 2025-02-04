@@ -11,11 +11,11 @@
     <script src="./feed.js"></script>
 </head>
 
-<body class="bg-white">
+<body class="bg-gray-100">
 
     <template id="post-template">
-        <div class="flex  justify-center items-center py-1 bg-blue-150 rounded-2xl">
-            <div class="w-full mb-4 max-w-2xl  p-6 rounded-2xl shadow-lg">
+        <div class="flex justify-center items-center py-1 bg-red-200 rounded-2xl">
+            <div class="w-full max-w-2xl bg-[#E6EEFA] p-6 rounded-2xl shadow-lg">
                 <div class="flex items-center mb-6">
                     <div>
                         <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="w-16 h-16 object-cover rounded-full">
@@ -88,8 +88,7 @@
                 <input type="search" placeholder="Buscar...">
             </div>
             <div class="user-profile">
-                <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp"
-                    alt="Foto de perfil">
+                <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp" alt="Foto de perfil">
                 <span>Nombre del Usuario</span>
             </div>
         </header>
@@ -109,23 +108,19 @@
             </nav>
         </aside>
         <main class="flex-1 p-4">
-            <div class="p-6 mb-4 border rounded-lg shadow-lg max-w-md mx-auto bg-white">
-                <div class="flex items-center space-x-4">
-                    <div class="rounded-full bg-gray-300 w-12 h-12">
-                        <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp"
-                            alt="User profile" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <textarea id="openModal"
-                        class="w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows="1" placeholder="What's on your mind?"></textarea>
+            <div id="post-container">
+                <h1 class="text-2xl font-bold mb-4">Notifications</h1> 
+                <div class="flex items-center justify-center space-x-4 mb-4">
+                    <button class="hover:underline focus:outline-none active:text-blue-900 p-2 rounded-lg ">All</button>
+                    <button class="text-gray-700 p-2 rounded-lg  hover:underline focus:outline-none active:text-blue-900">Unread</button>
+                </div>
+                <div class="flex justify-end">
+                    <button class="text-blue-500 hover:underline focus:outline-none">Mark all as Read</button>
                 </div>
             </div>
-
-            <div id="post-container">
-                <h1 class="mb-4"> Publicaciones</h1>
-            </div>
         </main>
-        <aside class="w-auto p-4 ">
+        
+        <aside class="w-auto p-4 mr-10">
             <div id="content-container" class="flex-col flex ">
                 <div id="tendencias" class="mb-10">
                     <h1>Tendencias</h1>
@@ -137,13 +132,5 @@
         </aside>
     </div>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Este es el contenido del modal.</p>
-        </div>
-
-
 </body>
-
 </html>
