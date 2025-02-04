@@ -1,0 +1,160 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #1e3a8a, #f87171);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.registro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    backdrop-filter: blur(10px);
+    padding: 20px;
+}
+
+form.registroform {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    color: #f1f5f9;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+.section {
+    margin-bottom: 20px;
+    flex-direction: column;
+}
+
+.inputbox {
+    margin-top: 24px;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+label {
+    color: white;
+}
+
+input {
+    padding: 12px 12px 12px 40px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid white;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+}
+
+input::placeholder { 
+    color: white;
+    font-size: 0.9rem;
+}
+
+ion-icon {
+    position: absolute;
+    left: 10px;
+    color: #ddd;
+    font-size: 1.25rem;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.next-button {
+    width: 48%;
+    padding: 12px;
+    background-color: #4299e1;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.back-button {
+    width: 48%;
+    padding: 12px;
+    background-color: #cbd5e0;
+    color: black;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+    background-color: #3182ce;
+}
+
+.back-button:hover {
+    background-color: #a0aec0;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16px;
+    color: #f1f5f9;
+}
+
+.footer-text {
+    margin-right: 8px;
+}
+
+.sign-up {
+    color: #63b3ed;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.sign-up:hover {
+    color: #3182ce;
+}
+.error-message {
+    flex: auto;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: red;
+}

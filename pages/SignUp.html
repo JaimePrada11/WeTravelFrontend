@@ -3,9 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="../register.css">
+    <script defer src="../register.js"></script>
 </head>
 <body>
-    
+    <section class="registro">
+        <form class="registroform" id="login-form" >
+            <h1>Sign Up</h1>
+            <div class="section" id="section-1">
+                <div class="inputbox">
+                    <label for="full-name">Nombre Completo</label>
+                    <div class="input-container">
+                        <ion-icon name="person-outline"></ion-icon>
+                        <input type="text" name="full-name" id="full-name" placeholder="Enter your full name" autocomplete="off" class="input" required>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="next-button" id="next-1">Next</button>
+                </div>
+            </div>
+            <div class="section" id="section-2" style="display: none;">
+                <div class="inputbox">
+                    <label for="email">Email</label>
+                    <div class="input-container">
+                        <ion-icon name="mail-outline"></ion-icon>
+                        <input type="email" name="email" id="email" placeholder="Enter your email" autocomplete="off" class="input" required>
+                    </div>
+                </div>
+                <div class="inputbox">
+                    <label for="username">Usuario</label>
+                    <div class="input-container">
+                        <ion-icon name="person-outline"></ion-icon>
+                        <input type="text" name="username" id="username" placeholder="Enter your username" autocomplete="off" class="input" required>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="back-button" id="back-2">Back</button>
+                    <button type="button" class="next-button" id="next-2">Next</button>
+                </div>
+            </div>
+            <div class="section" id="section-3" style="display: none;">
+                <div class="inputbox">
+                    <label for="password">Password</label>
+                    <div class="input-container">
+                        <ion-icon name="key-outline"></ion-icon>
+                        <input type="password" name="password" id="password" placeholder="Enter your password" class="input" required>
+                    </div>
+                </div>
+                <div class="inputbox">
+                    <label for="repeat-password">Repite tu contraseña</label>
+                    <div class="input-container">
+                        <ion-icon name="key-outline"></ion-icon>
+                        <input type="password" name="repeat-password" id="repeat-password" placeholder="Repeat your password" class="input" required>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="back-button" id="back-3">Back</button>
+                    <button type="submit" class="next-button">Register</button>
+                </div>
+            </div>
+            <div class="footer">
+                <p class="footer-text">Already have an account?</p>
+                <a href="./SignIn.html" class="sign-up">Sign In</a>
+            </div>
+        </form>
+    </section>
 </body>
 </html>
