@@ -11,31 +11,37 @@
 
 <body>
     <section class="inicio-sesion">
-        <form class="login">
+        <form class="login" id="loginForm">
             <h1>Sign In</h1>
+
             <div class="inputbox">
                 <label for="username">Usuario</label>
                 <div class="input-container">
                     <ion-icon name="person-outline"></ion-icon>
-                    <input type="text" name="username" id="username" placeholder="Enter your username"
-                        autocomplete="off" class="input" required>
+                    <input type="text" name="username" id="username" placeholder="Enter your username" autocomplete="off" required>
                 </div>
             </div>
+
             <div class="inputbox">
-                <label for="password" class="input-label">Password</label>
+                <label for="password">Password</label>
                 <div class="input-container">
                     <ion-icon name="key-outline"></ion-icon>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" class="input"
-                        required>
+                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
                 </div>
             </div>
+
+            <div id="error-message" style="color: red; display: none;"></div> <!-- Para mostrar errores -->
+
             <button type="submit">Login</button>
+
             <div class="footer">
-                <p class="footer-text">Don't have an account?</p>
+                <p>Don't have an account?</p>
                 <a href="./SignUp.html" class="sign-up">Sign Up</a>
             </div>
         </form>
     </section>
+
+    <script src="../login.js"></script> 
 </body>
 
 </html>

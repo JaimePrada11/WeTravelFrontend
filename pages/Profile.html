@@ -6,42 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class=" py-1">
-        <div class="p-6 rounded-xl flex flex-col items-center ">
-            <div class="flex justify-start items-center space-x-6">
-                <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
-                    class="w-24 h-24 object-cover rounded-full border-2 border-gray-300">
+    <link rel="stylesheet" href="./Profile.css">
+    <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
 
-                <div class="flex flex-col items-center justify-center text-center">
-                    <h1 class="text-2xl font-semibold">Camila</h1>
-                    <p class="text-gray-500">@Camiditol</p>
-                    <p class="text-gray-500 ">Lorem ipsum sit amet consectetur adipisicing elit. Nesciunt vero
-                        repellendus omnis minima, </p>
+    <script src="./Profile.js"></script>
+</head>
+
+<body>
+
+    <aside class="h-screen w-64 bg-blue-500/10">
+        <nav>
+            <ul class="flex uppercase flex-col justify-between items-center h-full space-y-10">
+                <li class="p-5 flex">
+                    <ion-icon class="mr-2" name="home-outline"></ion-icon> home
+                </li>
+                <li class="p-5">Search</li>
+                <li class="p-5">Notificaciones</li>
+                <li class="p-5">Tendencias</li>
+                <li class="p-5">Ajustes</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="profile">
+            <div class="profile-container">
+                <div class="profile-header">
+
+                    <div class="profile-info">
+                        <div class="profile-details">
+                            <h1 class="profile-name">Emilia Perez</h1>
+                            <p class="profile-username">@Camiditol</p>
+
+                        </div>
+                        <p class="profile-bio">Lorem ipsum sit amet consectetur adipisicing elit. Nesciunt vero
+                            repellendus
+                            omnis minima,</p>
+                    </div>
+                    <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
+                        class="profile-image">
                 </div>
-            </div>
-            <div class="flex items-center space-x-6 mt-6">
-                <div class="text-center">
-                    <p class="font-semibold text-lg">120</p>
-                    <p class="text-sm text-gray-500">Publicaciones</p>
-                </div>
-                <div class="text-center">
-                    <p class="font-semibold text-lg">500</p>
-                    <p class="text-sm text-gray-500">Seguidores</p>
-                </div>
-                <div class="text-center">
-                    <p class="font-semibold text-lg">180</p>
-                    <p class="text-sm text-gray-500">Siguiendo</p>
+
+                <div class="line"></div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <p class="stat-number">120</p>
+                        <p class="stat-label">Publicaciones</p>
+                    </div>
+                    <div class="profile-stat">
+                        <p class="stat-number">500</p>
+                        <p class="stat-label">Seguidores</p>
+                    </div>
+                    <div class="profile-stat">
+                        <p class="stat-number">180</p>
+                        <p class="stat-label">Siguiendo</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="flex items-center justify-center">
-        <button class="hover:underline active:blue-900 p-2 rounded-lg">Post</button>
-        <button class="text-gray-700 p-2 rounded-lg ">Likes</button>
-        <button class=" text-gray-700 p-2 rounded-lg ">Saved</button>
-    </div>
+
+        <div class="button-container">
+            <a class="button post-button selected"> <ion-icon name="library-outline"></ion-icon> Post</button>
+                <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</button>
+                    <a class="button saved-button">Saved</button>
+        </div>
+
+
+        <div class="post-container">
+
+        </div>
+    </main>
+
+    <aside class="w-auto p-4 ">
+        <div id="content-container" class="flex-col flex ">
+            <div id="tendencias" class="mb-10">
+                <h1>Tendencias</h1>
+            </div>
+            <div id="seguidores">
+                <h1>Sugerencias</h1>
+            </div>
+        </div>
+    </aside>
+
 </body>
 
 </html>
