@@ -84,3 +84,8 @@ aside {
     text-decoration: none;
     cursor: pointer;
 }
+
+#hashtags-container{
+    display: flex;
+    flex-wrap: wrap;
+}
