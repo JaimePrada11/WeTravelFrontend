@@ -14,31 +14,31 @@
 <body class="bg-white">
 
     <template id="post-template">
-        <div class="flex  justify-center items-center py-1 bg-blue-150 rounded-2xl">
-            <div class="w-full mb-4 max-w-2xl  p-6 rounded-2xl shadow-lg">
-                <div class="flex items-center mb-6">
-                    <div>
-                        <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="w-16 h-16 object-cover rounded-full">
+        <div class="post-container">
+            <div class="postcard" id="postcard">
+                <div class="post-header">
+                    <div class="profile-image-container">
+                        <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="profile-image" id="photo">
                     </div>
-                    <div class="ml-4">
-                        <h2 class="font-semibold text-lg">NOMBRE_DEL_USUARIO</h2>
-                        <p class="text-sm text-gray-500">@USUARIO</p>
+                    <div class="user-info" >
+                        <h2 class="user-name" id="name">NOMBRE_DEL_USUARIO</h2>
+                        <p class="user-handle" id="userName">@USUARIO</p>
                     </div>
                 </div>
 
-                <div id="hashtags-container" class="text-blue-900 font-bold mb-2"></div>
+                <div id="hashtags-container" class="hashtags"></div>
 
-                <p id="post-content" class="text-gray-700 mb-4">CONTENIDO_DEL_POST</p>
+                <p id="post-content" class="post-content">CONTENIDO_DEL_POST</p>
 
-                <div id="post-images-container" class="flex flex-wrap gap-4 justify-center mb-6"></div>
+                <div id="post-images-container" class="post-images"></div>
 
-                <div class="flex items-center justify-between text-gray-700">
-                    <div class="flex items-center gap-3 cursor-pointer">
-                        <ion-icon name="chatbubble-outline" class="text-blue-900 text-2xl"></ion-icon>
+                <div class="post-footer">
+                    <div class="comments-section">
+                        <ion-icon name="chatbubble-outline" class="icon"></ion-icon>
                         <p id="comments-count">NUM_COMENTARIOS</p>
                     </div>
-                    <div class="flex items-center gap-3 cursor-pointer hover:text-red-500">
-                        <ion-icon name="heart-outline" class="text-blue-900 text-2xl hover:text-red-500"></ion-icon>
+                    <div class="likes-section">
+                        <ion-icon name="heart-outline" class="icon"></ion-icon>
                         <p id="likes-count">NUM_LIKES</p>
                     </div>
                 </div>
@@ -46,13 +46,14 @@
         </div>
     </template>
 
-    <template id="template-1">
+
+    <template id="tags-template">
         <div class="w-full max-w-xl mx-auto mt-1">
-            <div class=" p-2 rounded-lg ">
-                <div class="mt-2 flex justify-between">
-                    <div class="flex flex-col justify-start space-x-2">
-                        <span class="text-lg font-bold" id="template1-name">#Emilia Perez</span>
-                        <p class="text-gray-500 text-sm" id="template1-posts">+20k publicaciones</p>
+            <div class="p-1 rounded-2xl ">
+                <div class="mt-1 flex justify-between bg-red-900">
+                    <div class="flex flex-col justify-start space-x-5">
+                        <span class="text-lg font-bold" id="tagstemplatename">#TagName</span>
+                        <p class="text-gray-500 text-sm" id="tagstemplateposts">veces usadas</p>
                     </div>
                     <ion-icon name="ellipsis-vertical-outline"></ion-icon>
                 </div>
@@ -79,21 +80,7 @@
 
     </template>
 
-    <div>
-        <header>
-            <div class="logo">
-                <h1>WeTravel</h1>
-            </div>
-            <div class="search-input">
-                <input type="search" placeholder="Buscar...">
-            </div>
-            <div class="user-profile">
-                <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp"
-                    alt="Foto de perfil">
-                <span>Nombre del Usuario</span>
-            </div>
-        </header>
-    </div>
+
     <div class="flex">
         <aside class="h-screen w-64 bg-blue-500/10">
             <nav>
@@ -121,9 +108,10 @@
                 </div>
             </div>
 
-            <div id="post-container">
+            <div id="post-container" class="post-container" >
                 <h1 class="mb-4"> Publicaciones</h1>
             </div>
+
         </main>
         <aside class="w-auto p-4 ">
             <div id="content-container" class="flex-col flex ">
