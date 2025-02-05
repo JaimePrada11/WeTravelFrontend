@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     function clearLocalStorage() {
         localStorage.clear();
         console.log("El localStorage ha sido borrado.");
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
-        logoutButton.addEventListener('click', function() {
+        logoutButton.addEventListener('click', function () {
             clearLocalStorage();
         });
     }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadForYou() {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8080/api/post', { 
+            const response = await fetch('http://localhost:8080/api/post', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Error al obtener los posts de For You');
             }
             const data = await response.json();
-            document.getElementById('post-container').innerHTML = ''; 
-            data.forEach((post, index) => renderPost(post, index)); 
+            document.getElementById('post-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
         } catch (error) {
             console.error('Error fetching For You posts:', error);
         }
@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user'));
-            
-            const response = await fetch(`http://localhost:8080/api/post/my/${user.idUser}`, { 
+
+            const response = await fetch(`http://localhost:8080/api/post/my/${user.idUser}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,8 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Error al obtener los posts de Following');
             }
             const data = await response.json();
-            document.getElementById('post-container').innerHTML = ''; 
-            data.forEach((post, index) => renderPost(post, index)); 
+            document.getElementById('post-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
         } catch (error) {
             console.error('Error fetching Following posts:', error);
         }
@@ -135,8 +135,13 @@ document.addEventListener('DOMContentLoaded', function () {
             hashtagElement.href = `#${tag.tagContent}`;
             hashtagElement.textContent = `#${tag.tagContent}`;
             hashtagElement.classList.add('mr-2', 'text-blue-900');
+            hashtagElement.addEventListener('click', function (event) {
+                event.preventDefault();
+                loadPostsByTag(tag.tagContent);
+            });
             hashtagsContainer.appendChild(hashtagElement);
         });
+
 
         const imagesContainer = clone.querySelector('#post-images-container');
         data.photoDTOurl.forEach(imageUrl => {
@@ -149,9 +154,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const postcard = clone.querySelector('.postcard');
         if (index % 2 === 0) {
-            postcard.classList.add('par'); 
+            postcard.classList.add('par');
         } else {
-            postcard.classList.add('impar'); 
+            postcard.classList.add('impar');
         }
 
         document.getElementById('post-container').appendChild(clone);
@@ -178,22 +183,52 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function loadPostsByTag(tag) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8080/api/post/tag/${tag}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Error al obtener los posts por tag');
+            }
+            const data = await response.json();
+            document.getElementById('post-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        } catch (error) {
+            console.error('Error fetching posts by tag:', error);
+        }
+    }
+
+
+
     function renderTags(data) {
         const template = document.getElementById('tags-template');
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector('#tagstemplatename').textContent = `#${data.content}`;
+        const tagElement = clone.querySelector('#tagstemplatename');
+        tagElement.textContent = `#${data.content}`;
         clone.querySelector('#tagstemplateposts').textContent = `${data.count} publicaciones`;
+
+        tagElement.addEventListener('click', function (event) {
+            event.preventDefault();
+            loadPostsByTag(data.content);
+        });
 
         document.getElementById('tendencias').appendChild(clone);
     }
+
 
     loadTags();
 
     loadForYou();
 
-    const forYouButton = document.querySelector('.post-button'); 
-    const followingButton = document.querySelector('.likes-button'); 
+    const forYouButton = document.querySelector('.post-button');
+    const followingButton = document.querySelector('.likes-button');
 
     forYouButton.addEventListener('click', () => {
         forYouButton.classList.add('selected');
@@ -204,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
     followingButton.addEventListener('click', () => {
         followingButton.classList.add('selected');
         forYouButton.classList.remove('selected');
-        loadFollowing(); 
+        loadFollowing();
     });
 });
 

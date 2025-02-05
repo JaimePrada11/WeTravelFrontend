@@ -8,47 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/styles/feed.css">
-    <script src="../assets/js/feed.js"></script>
+    <script src="../assets/js/search.js"></script>
 </head>
 
 <body class="bg-white">
-
-    <template id="post-template">
-        <div class="post-container">
-            <div class="postcard" id="postcard">
-                <div class="post-header">
-                    <div class="profile-image-container">
-                        <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="profile-image" id="photo">
-                    </div>
-                    <div class="user-info">
-                        <h2 class="user-name" id="name">NOMBRE_DEL_USUARIO</h2>
-                        <p class="user-handle" id="userName">@USUARIO</p>
-
-                    </div>
-                    <div class="hour-post">
-                        <p class="hour" id="hour"> Hora</p>
-                    </div>
-                </div>
-
-                <div id="hashtags-container" class="hashtags"></div>
-
-                <p id="post-content" class="post-content">CONTENIDO_DEL_POST</p>
-
-                <div id="post-images-container" class="post-images"></div>
-
-                <div class="post-footer">
-                    <div class="comments-section">
-                        <ion-icon name="chatbubble" class="icon"></ion-icon>
-                        <p id="comments-count">NUM_COMENTARIOS</p>
-                    </div>
-                    <div class="likes-section">
-                        <ion-icon name="heart-outline" class="icon"></ion-icon>
-                        <p id="likes-count">NUM_LIKES</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
 
 
     <template id="tags-template">
@@ -93,17 +56,14 @@
                         <h1 class="logo">WeTravel</h1>
                     </li>
                     <li class="nav-item">
-                        <a href="./Feed.html" id="logout-button">
-                        <ion-icon class="icon" name="home"></ion-icon> Home</a>
+                        <ion-icon class="icon" name="home"></ion-icon> Home
                     </li>
 
                     <li class="nav-item">
-                        <a href="./Search.html" id="logout-button">
-                        <ion-icon class="icon" name="search"></ion-icon> Search</a>
+                        <ion-icon class="icon" name="search"></ion-icon> Search
                     </li>
                     <li class="nav-item">
-                        <a href="../Notification.html" id="logout-button">
-                        <ion-icon class="icon" name="notifications"></ion-icon> Notifications</a>
+                        <ion-icon class="icon" name="notifications"></ion-icon> Notifications
                     </li>
                     <li class="nav-item">
                         <a href="../Index.html" id="logout-button">
@@ -120,20 +80,15 @@
 
 
         <main class="main-content">
-            <div class="post-box">
+            <div class="search">
                 <div class="user-input">
-                    <div class="profile-pic">
-                        <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"
-                            alt="User profile" id="profileimagesearch" />
+                    <div class="input-container">
+                        <ion-icon name="search-outline"></ion-icon>
+                        <input type="search" name="search" id="search" placeholder="Search" autocomplete="off" class="input" required>
                     </div>
-                    <textarea id="openModal" class="textarea" rows="1" placeholder="What's on your mind?"></textarea>
                 </div>
             </div>
 
-            <div class="button-container">
-                <a class="button post-button selected"> ForYou</a>
-                <a class="button likes-button"> Following</a>
-            </div>
             <div id="post-container" class="post-container">
 
 
