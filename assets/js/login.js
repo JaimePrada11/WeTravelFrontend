@@ -42,6 +42,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         }
 
         const userInfo = {
+            idUser: user.idUser,
             name: user.name,
             email: user.email,
             userName: user.userName,
