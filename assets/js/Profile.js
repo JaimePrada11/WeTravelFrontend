@@ -1,8 +1,9 @@
 import { loadLikePost, loadMyPost } from './main.js';
 import { fetchData } from './utils.js';
 
+const user = JSON.parse(localStorage.getItem('user'));
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
 
     if (user) {
         try {

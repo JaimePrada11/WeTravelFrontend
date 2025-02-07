@@ -8,13 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/styles/feed.css">
-    <script src="../assets/js/feed.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/Profile.js"></script>
+
 </head>
 
 <body class="bg-white">
 
     <template id="post-template">
-        <div class="post-container" >
+        <div class="post-container">
             <div class="postcard" id="postcard">
                 <div class="post-header">
                     <div class="profile-image-container">
@@ -41,8 +43,8 @@
                         <ion-icon name="chatbubble" class="icon"></ion-icon>
                         <p id="comments-count">NUM_COMENTARIOS</p>
                     </div>
-                    <div class="likes-section">
-                        <ion-icon name="heart-outline" class="icon"></ion-icon>
+                    <div class="likes-section" id="likes-section">
+                        <ion-icon id="likeUser" name="heart-outline" class="icon likes-button"></ion-icon>
                         <p id="likes-count">NUM_LIKES</p>
                     </div>
                 </div>
@@ -62,7 +64,7 @@
             </div>
         </div>
     </template>
-    
+
 
 
     <template id="template-2">
@@ -94,21 +96,21 @@
                     </li>
                     <li class="nav-item">
                         <a href="./Feed.html" id="logout-button">
-                        <ion-icon class="icon" name="home"></ion-icon> Home</a>
+                            <ion-icon class="icon" name="home"></ion-icon> Home</a>
                     </li>
 
                     <li class="nav-item">
                         <a href="./Search.html" id="logout-button">
-                        <ion-icon class="icon" name="search"></ion-icon> Search</a>
+                            <ion-icon class="icon" name="search"></ion-icon> Search</a>
                     </li>
                     <li class="nav-item">
                         <a href="../Notification.html" id="logout-button">
-                        <ion-icon class="icon" name="notifications"></ion-icon> Notifications</a>
+                            <ion-icon class="icon" name="notifications"></ion-icon> Notifications</a>
                     </li>
                     <li class="nav-item">
                         <a href="../Index.html" id="logout-button">
                             <ion-icon class="icon" name="exit"></ion-icon> LogOut
-                        </a> 
+                        </a>
                     </li>
                     <li class="profile">
                         <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"

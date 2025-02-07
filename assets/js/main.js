@@ -1,24 +1,27 @@
-import { timeAgo, fetchData } from './utils.js';
+import { timeAgo, fetchData, postData, deleteData } from './utils.js';
+
+const user = JSON.parse(localStorage.getItem('user'));
+
 
 export async function loadMyPost() {
-    const user = JSON.parse(localStorage.getItem('user'));
     if (!user) return;
 
     const data = await fetchData(`post/user/${user.email}`);
     if (data) {
         document.getElementById('post-container').innerHTML = '';
-        data.forEach((post, index) => renderPost(post, index));  
+        data.forEach((post, index) => renderPost(post, index));
     }
 }
 
 export async function loadLikePost() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return;
+    if (!user) return
+    console.log(user.email)
 
     const data = await fetchData(`post/liked/${user.email}`);
     if (data) {
         document.getElementById('post-container').innerHTML = '';
-        data.forEach((post, index) => renderPost(post, index)); 
+        data.forEach((post, index) => renderPost(post, index));
     }
 }
 
@@ -26,7 +29,7 @@ export async function loadTags() {
     const data = await fetchData('tag/tagDTO');
     if (data) {
         const sortedTags = data.sort((a, b) => b.count - a.count);
-        sortedTags.slice(0, 3).forEach(tag => renderTags(tag)); 
+        sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
     }
 }
 
