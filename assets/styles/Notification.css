@@ -1,0 +1,107 @@
+main {
+    margin: 0 250px 0 270px; 
+    padding: 20px;
+    flex: 1;
+    background-color: #fafafa;
+    min-height: 100vh;
+}
+/* Estilos base */
+.notification-card {
+    display: flex;
+    justify-content: space-between; /* Separa el contenido y el botón */
+    align-items: center;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    background-color: white;
+    margin-bottom: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-details {
+    margin-left: 16px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.user-name span {
+    font-weight: 400;
+}
+
+.user-handle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+}
+
+.follow-button {
+    background-color: #3b83f67c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 1vw;
+}
+
+.follow-button:hover {
+    background-color: #2564eb86;
+}
+
+/* Estilos responsive */
+@media (max-width: 1070px) {
+    .notification-card {
+        flex-direction: column; /* Apila el contenido verticalmente */
+        align-items: center;
+        text-align: center; /* Centra el texto */
+    }
+
+    .user-info {
+        flex-direction: column; /* Apila la imagen y el texto verticalmente */
+        align-items: center;
+    }
+
+    .user-details {
+        margin-left: 0; /* Elimina el margen izquierdo */
+        margin-top: 8px; /* Añade un margen superior */
+    }
+
+    .profile-img {
+        width: 48px; /* Reduce el tamaño de la imagen */
+        height: 48px;
+    }
+
+    .user-name {
+        font-size: 16px; /* Reduce el tamaño de la fuente */
+    }
+
+    .user-handle {
+        font-size: 12px; /* Reduce el tamaño de la fuente */
+    }
+
+    .follow-button {
+        width: 100%; /* Hace que el botón ocupe todo el ancho */
+        margin-top: 8px; /* Añade un margen superior */
+    }
+}

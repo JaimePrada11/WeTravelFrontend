@@ -8,129 +8,244 @@
     <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/styles/feed.css">
-    <script src="./feed.js"></script>
+    <link rel="stylesheet" href="../assets/styles/Notification.css">
+    <!-- <script src="./feed.js"></script> -->
+    <script src="../assets/js/notification.js"></script>
 </head>
 
-<body class="bg-gray-100">
+<body>
 
-    <template id="post-template">
-        <div class="flex justify-center items-center py-1 bg-red-200 rounded-2xl">
-            <div class="w-full max-w-2xl bg-[#E6EEFA] p-6 rounded-2xl shadow-lg">
-                <div class="flex items-center mb-6">
-                    <div>
-                        <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="w-16 h-16 object-cover rounded-full">
-                    </div>
-                    <div class="ml-4">
-                        <h2 class="font-semibold text-lg">NOMBRE_DEL_USUARIO</h2>
-                        <p class="text-sm text-gray-500">@USUARIO</p>
-                    </div>
-                </div>
+    <aside class="sidebar">
+        <nav>
+            <ul class="nav-list">
+                <li class="nav-header">
+                    <h1 class="logo">WeTravel</h1>
+                </li>
+                <li class="nav-item">
+                    <a href="./Feed.html" id="logout-button">
+                        <ion-icon class="icon" name="home"></ion-icon> Home</a>
+                </li>
 
-                <div id="hashtags-container" class="text-blue-900 font-bold mb-2"></div>
+                <li class="nav-item">
+                    <a href="./Search.html" id="logout-button">
+                        <ion-icon class="icon" name="search"></ion-icon> Search</a>
+                </li>
+                <li class="nav-item">
+                    <a href="../Notification.html" id="logout-button">
+                        <ion-icon class="icon" name="notifications"></ion-icon> Notifications</a>
+                </li>
+                <li class="nav-item">
+                    <a href="../Index.html" id="logout-button">
+                        <ion-icon class="icon" name="exit"></ion-icon> LogOut
+                    </a>
+                </li>
+                <li class="profile">
+                    <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt=""
+                        id="profileimage"> <a href="./Profile.html">Profile</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <h2>Notifications</h2>
 
-                <p id="post-content" class="text-gray-700 mb-4">CONTENIDO_DEL_POST</p>
+        <section class="NotificationContent">
+            <div class="notification_comment">
 
-                <div id="post-images-container" class="flex flex-wrap gap-4 justify-center mb-6"></div>
 
-                <div class="flex items-center justify-between text-gray-700">
-                    <div class="flex items-center gap-3 cursor-pointer">
-                        <ion-icon name="chatbubble-outline" class="text-blue-900 text-2xl"></ion-icon>
-                        <p id="comments-count">NUM_COMENTARIOS</p>
-                    </div>
-                    <div class="flex items-center gap-3 cursor-pointer hover:text-red-500">
-                        <ion-icon name="heart-outline" class="text-blue-900 text-2xl hover:text-red-500"></ion-icon>
-                        <p id="likes-count">NUM_LIKES</p>
-                    </div>
+            </div>
+
+            <div class="notification_follow">
+
+            </div>
+            <div class="notification_like">
+
+            </div>
+
+        </section>
+
+
+
+
+
+       
+    
+    </main>
+
+
+
+
+    <aside class="sidebar-right">
+        <div id="content-container" class="content-container">
+            <div id="seguidores" class="section">
+                <h1>Sugerencias</h1>
+            </div>
+            <div>
+                <h1 class="titletendencias">Tendencias</h1>
+                <div id="tendencias" class="section">
                 </div>
             </div>
+
+
         </div>
-    </template>
+        <footer class="footer">
+            <h2>@2025 WeTravel</h2>
+        </footer>
+    </aside>
 
-    <template id="template-1">
-        <div class="w-full max-w-xl mx-auto mt-1">
-            <div class=" p-2 rounded-lg ">
-                <div class="mt-2 flex justify-between">
-                    <div class="flex flex-col justify-start space-x-2">
-                        <span class="text-lg font-bold" id="template1-name">#Emilia Perez</span>
-                        <p class="text-gray-500 text-sm" id="template1-posts">+20k publicaciones</p>
-                    </div>
-                    <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </template>
 
-    <template id="template-2">
-        <div class="flex justify-between items-center rounded-2xl shadow-lg p-6 space-x-6">
-            <div class="flex items-center">
-                <div>
-                    <img src="IMAGEN_DE_PERFIL" alt="User Profile" class="w-16 h-16 object-cover rounded-full"
-                        id="template2-profile-img">
-                </div>
-                <div class="ml-4">
-                    <h2 class="font-semibold text-lg" id="template2-name">NOMBRE_DEL_USUARIO</h2>
-                    <p class="text-sm text-gray-500" id="template2-handle">@USUARIO</p>
-                </div>
-            </div>
-            <div class="flex items-center">
-                <button class="bg-blue-500 hover:bg-blue-600 cursor-pointer p-2 rounded-xl text-white">Seguir</button>
-            </div>
-        </div>
 
-    </template>
-
-    <div>
-        <header>
-            <div class="logo">
-                <h1>WeTravel</h1>
-            </div>
-            <div class="search-input">
-                <input type="search" placeholder="Buscar...">
-            </div>
-            <div class="user-profile">
-                <img src="https://images.ctfassets.net/vztl6s0hp3ro/730j3EU8CMGQShwD1iLV7F/6e1c84839ab12aa03958a33fea129ded/what-is-a-chief-people-officer-and-why-does-it-matter.webp" alt="Foto de perfil">
-                <span>Nombre del Usuario</span>
-            </div>
-        </header>
-    </div>
-    <div class="flex">
-        <aside class="h-screen w-64 bg-blue-500/10">
-            <nav>
-                <ul class="flex uppercase flex-col justify-between items-center h-full space-y-10">
-                    <li class="p-5 flex">
-                        <ion-icon class="mr-2" name="home-outline"></ion-icon> home
-                    </li>
-                    <li class="p-5">Search</li>
-                    <li class="p-5">Notificaciones</li>
-                    <li class="p-5">Tendencias</li>
-                    <li class="p-5">Ajustes</li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="flex-1 p-4">
-            <div id="post-container">
-                <h1 class="text-2xl font-bold mb-4">Notifications</h1> 
-                <div class="flex items-center justify-center space-x-4 mb-4">
-                    <button class="hover:underline focus:outline-none active:text-blue-900 p-2 rounded-lg ">All</button>
-                    <button class="text-gray-700 p-2 rounded-lg  hover:underline focus:outline-none active:text-blue-900">Unread</button>
-                </div>
-                <div class="flex justify-end">
-                    <button class="text-blue-500 hover:underline focus:outline-none">Mark all as Read</button>
-                </div>
-            </div>
-        </main>
-        
-        <aside class="w-auto p-4 mr-10">
-            <div id="content-container" class="flex-col flex ">
-                <div id="tendencias" class="mb-10">
-                    <h1>Tendencias</h1>
-                </div>
-                <div id="seguidores">
-                    <h1>Sugerencias</h1>
-                </div>
-            </div>
-        </aside>
-    </div>
 
 </body>
+
 </html>
+
+
+
+
+
+<template id="Noti-follow-template">
+    <div class="notification-card">
+        <div class="user-info">
+            <img src="">
+            <div class="user-details">
+                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> Ha comenzado a seguirte</span></h2>
+                <p class="user-handle" id="template2-handle">@USUARIO</p>
+            </div>
+        </div>
+        <div class="action-button">
+            <button class="follow-button">Seguir</button>
+        </div>
+        <div class="action-button">
+            <button class="follow-button">Check</button>
+        </div>
+    </div>
+</template>
+
+
+<template id="Noti-like-template">
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
+                <div class="user-details">
+                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has given you a like </span></h2>
+                    <p class="user-handle" id="template2-handle">@USUARIO</p>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Post</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Check</button>
+            </div>
+        </div>
+    </template>
+
+
+
+    <template id="Noti-comment-template">
+    <div class="notification-card">
+        <div class="user-info">
+            <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
+            <div class="user-details">
+                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has made a comment </span></h2>
+                <p class="user-handle" id="template2-handle">@USUARIO</p>
+            </div>
+            
+        </div>
+        <div class="action-button">
+            <button class="follow-button"> Post</button>
+        </div>
+        <div class="action-button">
+            <button class="follow-button">Check</button>
+        </div>
+    </div>
+    </template>
+
+<!-- <template id="post-template">
+    <div class="flex justify-center items-center py-1 bg-red-200 rounded-2xl">
+        <div class="w-full max-w-2xl bg-[#E6EEFA] p-6 rounded-2xl shadow-lg">
+            <div class="flex items-center mb-6">
+                <div>
+                    <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="w-16 h-16 object-cover rounded-full">
+                </div>
+                <div class="ml-4">
+                    <h2 class="font-semibold text-lg">NOMBRE_DEL_USUARIO</h2>
+                    <p class="text-sm text-gray-500">@USUARIO</p>
+                </div>
+            </div>
+
+            <div id="hashtags-container" class="text-blue-900 font-bold mb-2"></div>
+
+            <p id="post-content" class="text-gray-700 mb-4">CONTENIDO_DEL_POST</p>
+
+            <div id="post-images-container" class="flex flex-wrap gap-4 justify-center mb-6"></div>
+
+            <div class="flex items-center justify-between text-gray-700">
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <ion-icon name="chatbubble-outline" class="text-blue-900 text-2xl"></ion-icon>
+                    <p id="comments-count">NUM_COMENTARIOS</p>
+                </div>
+                <div class="flex items-center gap-3 cursor-pointer hover:text-red-500">
+                    <ion-icon name="heart-outline" class="text-blue-900 text-2xl hover:text-red-500"></ion-icon>
+                    <p id="likes-count">NUM_LIKES</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-1">
+    <div class="w-full max-w-xl mx-auto mt-1">
+        <div class=" p-2 rounded-lg ">
+            <div class="mt-2 flex justify-between">
+                <div class="flex flex-col justify-start space-x-2">
+                    <span class="text-lg font-bold" id="template1-name">#Emilia Perez</span>
+                    <p class="text-gray-500 text-sm" id="template1-posts">+20k publicaciones</p>
+                </div>
+                <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-2">
+    <div class="flex justify-between items-center rounded-2xl shadow-lg p-6 space-x-6">
+        <div class="flex items-center">
+            <div>
+                <img src="IMAGEN_DE_PERFIL" alt="User Profile" class="w-16 h-16 object-cover rounded-full"
+                    id="template2-profile-img">
+            </div>
+            <div class="ml-4">
+                <h2 class="font-semibold text-lg" id="template2-name">NOMBRE_DEL_USUARIO</h2>
+                <p class="text-sm text-gray-500" id="template2-handle">@USUARIO</p>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <button class="bg-blue-500 hover:bg-blue-600 cursor-pointer p-2 rounded-xl text-white">Seguir</button>
+        </div>
+    </div>
+
+</template>
+
+<div id="post-container">
+    <h1 class="text-2xl font-bold mb-4">Notifications</h1> 
+    <div class="flex items-center justify-center space-x-4 mb-4">
+        <button class="hover:underline focus:outline-none active:text-blue-900 p-2 rounded-lg ">All</button>
+        <button class="text-gray-700 p-2 rounded-lg  hover:underline focus:outline-none active:text-blue-900">Unread</button>
+    </div>
+    <div class="flex justify-end">
+        <button class="text-blue-500 hover:underline focus:outline-none">Mark all as Read</button>
+    </div>
+</div>
+
+<aside class="w-auto p-4 mr-10">
+    <div id="content-container" class="flex-col flex ">
+        <div id="tendencias" class="mb-10">
+            <h1>Tendencias</h1>
+        </div>
+        <div id="seguidores">
+            <h1>Sugerencias</h1>
+        </div>
+    </div>
+</aside> -->
