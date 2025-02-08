@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../assets/styles/feed.css">
     <link rel="stylesheet" href="../assets/styles/Notification.css">
     <!-- <script src="./feed.js"></script> -->
-    <script src="../assets/js/notification.js "defer></script>
+    <script type="module" src="../assets/js/notification.js "defer></script>
 </head>
 
 <body>
@@ -45,7 +45,7 @@
             </ul>
         </nav>
     </aside>
-    <main>
+    <main id="main">
         <h2>Notifications</h2>
 
         <section class="NotificationContent">
@@ -71,6 +71,7 @@
                               <input type="url" id="optionalLink2" placeholder="Photo 3" name="optionalLink2">
                           
                               <button type="submit">Post</button>
+                              <input type="hidden" id="postId" name="postId">
                             </form>
                           </div>
                     </div>
@@ -81,55 +82,7 @@
 
 
 
-        <div class="notification-card">
-            <div class="user-info">
-                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
-              
-                <div class="user-details">
-                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> Ha comenzado a seguirte</span></h2>
-                    <p class="user-handle" id="template2-handle">@USUARIO</p>
-                </div>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Seguir</button>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Check</button>
-            </div>
-        </div>
-    
-        <div class="notification-card">
-            <div class="user-info">
-                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
-                <div class="user-details">
-                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has given you a like </span></h2>
-                    <p class="user-handle" id="template2-handle">@USUARIO</p>
-                </div>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Post</button>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Check</button>
-            </div>
-        </div>
-        <div class="notification-card">
-            <div class="user-info">
-                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
-                <div class="user-details">
-                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has made a comment </span></h2>
-                    <p class="user-handle" id="template2-handle">@USUARIO</p>
-                </div>
-                
-            </div>
-            <div class="action-button">
-                <button class="follow-button"> Post</button>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Check</button>
-            </div>
-        </div>
-
+       
        
     
     </main>
@@ -167,9 +120,9 @@
 <template id="Noti-follow-template">
     <div class="notification-card">
         <div class="user-info">
-            <img src="">
+            <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
             <div class="user-details">
-                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> Ha comenzado a seguirte</span></h2>
+                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has given you a like </span></h2>
                 <p class="user-handle" id="template2-handle">@USUARIO</p>
             </div>
         </div>
@@ -177,7 +130,7 @@
             <button class="follow-button">Seguir</button>
         </div>
         <div class="action-button">
-            <button class="follow-button">Check</button>
+            <button class="follow-button" id="checkButon">Check</button>
         </div>
     </div>
 </template>
@@ -197,11 +150,9 @@
                     <p class="user-handle" id="template2-handle">@USUARIO</p>
                 </div>
             </div>
+
             <div class="action-button">
-                <button class="follow-button">Post</button>
-            </div>
-            <div class="action-button">
-                <button class="follow-button">Check</button>
+                <button class="follow-button" id="checkButon">Check</button>
             </div>
         </div>
     </template>
@@ -213,7 +164,7 @@
         <div class="user-info">
             <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
             <div class="user-details">
-                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span > has made a comment </span> <span id="hora" > </span></h2>
+                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span > has made a comment </span> <span id="hora" >qq</span></h2>
                 <p class="user-handle" id="template2-handle">@USUARIO</p>
             </div>
             
@@ -222,7 +173,7 @@
             <button class="follow-button"> Post</button>
         </div>
         <div class="action-button">
-            <button class="follow-button">Check</button>
+            <button class="follow-button" id="checkButon">Check</button>
         </div>
     </div>
     </template>

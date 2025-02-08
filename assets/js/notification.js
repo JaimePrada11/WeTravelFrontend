@@ -1,25 +1,18 @@
+import { timeAgo, fetchData, postData, deleteData, putData } from './utils.js';
+
+
 async function loadForYouNotificationsByUsername() {
     try {
-        const token = localStorage.getItem('token');
-        const user= JSON.parse(localStorage.getItem('user'));
-        const username = user.userName;
-        console.log(user);
-        console.log(username);
-         const response = await fetch(`http://localhost:8080/api/notifications`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
         // /${user.userName} con ese traigo las notificaciones por username  
-        if (!response.ok) {
+        const user = localStorage.getItem("user")
+
+
+        const response = await fetchData("notifications");
+
+        if (response.ok) {
             throw new Error('Error al obtener los posts de For You');
         }
-        const data = await response.json();
-        console.log(data);
-      
-        return data
+        return response
     } catch (error) {
         console.error('Error fetching For You posts:', error);
     }
@@ -28,40 +21,100 @@ async function loadForYouNotificationsByUsername() {
 
 
 
-async function renderNotificsation(){
-      data  =  await loadForYouNotificationsByUsername();
-      
+async function renderNotificsation() {
 
-      data.forEach(element => {
-     const elementype =  element.tipo
-     console.log(elementype)
-        
-      });
+    const data = await loadForYouNotificationsByUsername();
+    // console.log(data)
+    data.forEach(element => {
 
+        // if (element.status === true) {
+        //     return
+        // }
+        if (element.tipo === 'Comment') {
+            // console.log(element)
+            loadNotificationComment(element)
+        } if (element.tipo ==='Like') {
+          
+            loadNotificationLike(element);
+
+
+        } 
+        if(element.tipo === 'Follow'){
+            loadNotificationfollow(element);
+       
+            console.log(element)
+        }})
+    };
+
+
+
+async function loadNotificationComment(element) {
+    const template = document.getElementById('Noti-comment-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#template2-profile-img').src = element.userPhoto;
+    clone.querySelector('#template2-name').textContent = `${element.name} has made  you a comment`;
+    clone.querySelector('#template2-handle').textContent = `@${element.username}`;
+
+
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('main').appendChild(clone);
 
 }
 
-
-
-renderNotificsation()
-
-
-async function loadNotificationComment(element){
-
+async function loadNotificationLike(element) {
     const template = document.getElementById('Noti-like-template');
     const clone = template.content.cloneNode(true);
-    clone.querySelector('#template2-profile-img').src =  element.userPhoto;
-    clone.querySelector('#template2-name').textContent = element.name;
-    clone.querySelector('#hora').textContent = element.;
+    clone.querySelector('#template2-profile-img').src = element.userPhoto;
+    clone.querySelector('#template2-name').textContent = `${element.name} has made you a Like`;
+    clone.querySelector('#template2-handle').textContent = `@${element.username}`;
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
 
+        await changeNotifcationstatus(element.idNotification);
+    });
 
+    document.getElementById('main').appendChild(clone);
 
+}
+async function loadNotificationfollow(element) {
+    const template = document.getElementById('Noti-follow-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#template2-profile-img').src = element.userPhoto;
+    clone.querySelector('#template2-name').textContent = `${element.name} has followed you `;
+    clone.querySelector('#template2-handle').textContent = `@${element.username}`;
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
 
-
-    
+        await changeNotifcationstatus(element.idNotification);
+    });
+    document.getElementById('main').appendChild(clone);
 
 }
 
+
+
+async function changeNotifcationstatus(id) {
+    try {
+        console.log(id);
+        const response = await postData(`notifications/read/${id}`);
+
+        // Imprimir la respuesta original para depurar
+      
+        
+        if (!response.ok) {
+            throw new Error('Error al marcar la notificación como leída');
+        }
+
+    } catch (error) {
+        console.error('Error marcando la notificación como leída:', error);
+    }
+}
 
 
 
@@ -71,18 +124,18 @@ async function loadNotificationComment(element){
 document.addEventListener("DOMContentLoaded", function () {
     // Esto carga el form en el Dom
     const form = document.getElementById("myForm");
-  
+
     if (form) {
-      form.addEventListener("submit", handleFormSubmit);
-      console.log("Formulario encontrado y evento añadido.");
+        form.addEventListener("submit", handleFormSubmit);
+        console.log("Formulario encontrado y evento añadido.");
     } else {
-      console.error("Error: No se encontró el formulario.");
+        console.error("Error: No se encontró el formulario.");
     }
 
 
+    renderNotificsation()
 
-
-// Esto es directamente para cargar el modal 
+    // Esto es directamente para cargar el modal 
 
     var modal = document.getElementById("myModal");
     var openModal = document.getElementById("openModal");
@@ -103,8 +156,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-  });
-  
+});
+
 
 
 
@@ -115,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 //  esto es parte crea el DTO  CREATEDTO  necesario para crear un post 
-  async function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
     event.preventDefault(); // Evita la recarga de la página
 
     const description = document.getElementById("description").value.trim();
@@ -126,13 +179,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!description || !tagsInput || !mainLink) {
         console.warn("Error: Faltan campos obligatorios.");
-        return; 
+        return;
     }
 
 
     let tagList = tagsInput.split("#")
-        .map(tag => tag.trim().toLowerCase()) 
-        .filter(tag => tag); 
+        .map(tag => tag.trim().toLowerCase())
+        .filter(tag => tag);
 
     // Convertir primera letra en mayúscula
     tagList = tagList.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1));
@@ -142,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Crear el objeto DTO
     const createPostDTO = {
-        description,
+        description: description,
         listTag: tagList,
         listPhoto: photos
     };
@@ -159,35 +212,41 @@ document.addEventListener("DOMContentLoaded", function () {
 async function PostPostfunction(createPostDTO) {
 
     try {
-        const token = localStorage.getItem('token');
-        const user= JSON.parse(localStorage.getItem('user'));
+
+        const user = JSON.parse(localStorage.getItem('user'));
         const email = user.email;
         console.log(user);
         console.log(email);
 
-        const response = await fetch(`http://localhost:8080/api/post/${email}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(createPostDTO)
-        });
+        const response = await postData(`post/${email}`, createPostDTO)
+
 
         if (!response.ok) {
             throw new Error('Creation post is not okay');
         }
 
-        const data = await response.json();
-        console.log(data);
-      
-        return data
+
+        return response
     } catch (error) {
         console.error('Error Creating your post:', error);
     }
 
-
-    
+    async function loadPostData(postId) {
+        try {
+            const post = await fetchData(`post/${postId}`);
+            
+            // Rellenar campos del formulario
+            document.getElementById('postId').value = post.id;
+            document.getElementById('description').value = post.description;
+            document.getElementById('tags').value = post.listTag.map(tag => `#${tag}`).join('');
+            document.getElementById('mainLink').value = post.listPhoto[0] || '';
+            document.getElementById('optionalLink1').value = post.listPhoto[1] || '';
+            document.getElementById('optionalLink2').value = post.listPhoto[2] || '';
+            
+        } catch (error) {
+            console.error('Error cargando post:', error);
+        }
+    }
 }
 
 
