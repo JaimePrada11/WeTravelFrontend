@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>WeTravel</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/styles/Profile.css">
     <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
 
     <script type="module" src="../assets/js/profile.js"></script>
+    <script type="module" src="../assets/js/feed.js"></script>
 </head>
 
-<body>
+<body class="profile-page">
 
     <template id="post-template">
         <div class="post-container">
@@ -51,7 +52,6 @@
         </div>
     </template>
 
-
     <template id="UserTemplate">
         <div class="people">
             <div class="user-info">
@@ -65,11 +65,9 @@
             <div class="action-button">
                 <button class="follow-button" id="follow">Seguir</button>
             </div>
-            
+
         </div>
     </template>
-    
-    
 
     <template id="tags-template">
         <div class="tag-card">
@@ -139,7 +137,6 @@
         </div>
     </template>
 
-
     <template id="template-2">
         <div class="flex justify-between items-center rounded-2xl shadow-lg p-6 space-x-6">
             <div class="flex items-center">
@@ -165,84 +162,106 @@
                 <li class="nav-header">
                     <h1 class="logo">WeTravel</h1>
                 </li>
-                <li class="nav-item">
-                    <a href="./Feed.html">
-                        <ion-icon class="icon" name="home"></ion-icon> Home</a>
+                <li class="nav-item" id="home-link">
+                    <a href="#">
+                        <ion-icon class="icon" name="home"></ion-icon> Home
+                    </a>
                 </li>
-
+                <li class="nav-item" id="profile-link">
+                    <a href="#">
+                        <ion-icon class="icon" name="person"></ion-icon> Profile
+                    </a>
+                </li>
                 <li class="nav-item">
                     <ion-icon class="icon" name="search"></ion-icon> Search
                 </li>
                 <li class="nav-item">
                     <ion-icon class="icon" name="notifications"></ion-icon> Notifications
                 </li>
-                <li class="nav-item">
-                    <a href="../Index.html" id="logout-button">
+                <li class="nav-item" id="logout-button">
+                    <a href="../Index.html">
                         <ion-icon class="icon" name="exit"></ion-icon> LogOut
                     </a>
                 </li>
                 <li class="profile">
                     <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt=""
-                        id="profileimage"> <a href="./Profile.html">Profile</a>
+                        id="profileimage">
+                    <a href="#" id="profile-link">Profile</a>
                 </li>
             </ul>
         </nav>
     </aside>
 
 
+
     <main class="main-content">
 
 
-        <div class="profile">
-            <div class="profile-container">
-                <div class="profile-header">
+        <div class="profile-container" id="profile-container">
+            <div class="profile">
+                <div class="profile-container">
+                    <div class="profile-header">
 
-                    <div class="profile-info">
-                        <div class="profile-details">
-                            <h1 class="profile-name" id="name">Emilia Perez</h1>
-                            <p class="profile-username" id="userName">@Camiditol</p>
+                        <div class="profile-info">
+                            <div class="profile-details">
+                                <h1 class="profile-name" id="name">Emilia Perez</h1>
+                                <p class="profile-username" id="userName">@Camiditol</p>
 
+                            </div>
+                            <p class="profile-bio" id="biography">Lorem ipsum sit amet consectetur adipisicing elit.
+                                Nesciunt vero
+                                repellendus
+                                omnis minima,</p>
                         </div>
-                        <p class="profile-bio" id="biography">Lorem ipsum sit amet consectetur adipisicing elit.
-                            Nesciunt vero
-                            repellendus
-                            omnis minima,</p>
+                        <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
+                            class="profile-image" id="photo">
                     </div>
-                    <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
-                        class="profile-image" id="photo">
-                </div>
-                <div>
-                    <button class="editprofile" id="openModal">Edit</button>
-                </div>
+                    <div>
+                        <button class="editprofile" id="openModal">Edit</button>
+                    </div>
 
-                <div class="line"></div>
-                <div class="profile-stats">
-                    <div class="profile-stat">
-                        <p class="stat-number" id="mypost">120</p>
-                        <p class="stat-label">Publicaciones</p>
-                    </div>
-                    <div class="profile-stat">
-                        <p class="stat-number" id="myfollowers">500</p>
-                        <p class="stat-label">Seguidores</p>
-                    </div>
-                    <div class="profile-stat">
-                        <p class="stat-number" id="myfollowed">180</p>
-                        <p class="stat-label">Siguiendo</p>
+                    <div class="line"></div>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <p class="stat-number" id="mypost">120</p>
+                            <p class="stat-label">Publicaciones</p>
+                        </div>
+                        <div class="profile-stat">
+                            <p class="stat-number" id="myfollowers">500</p>
+                            <p class="stat-label">Seguidores</p>
+                        </div>
+                        <div class="profile-stat">
+                            <p class="stat-number" id="myfollowed">180</p>
+                            <p class="stat-label">Siguiendo</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="button-container">
+                <a class="button post-button selected"> <ion-icon name="library-outline"></ion-icon> Post</a>
+                <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</a>
+            </div>
+
+
         </div>
 
-        <div class="button-container">
-            <a class="button post-button selected"> <ion-icon name="library-outline"></ion-icon> Post</a>
-            <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</a>
+        <div class="feed-container" id="feed-container">
+            <div class="button-feed">
+                <button id="recomend-button" class="button">Recomendados</button>
+                <button id="following-button" class="button">Seguidos</button>
+
+            </div>
+
+
         </div>
 
 
-        <div id="post-container" class="post-container">
-            
+        <div id="main-container"></div>
+        <div id="follows-container"></div>
 
-        </div><div id="follows-container"></div>
+
+
 
     </main>
 
@@ -271,7 +290,7 @@
         </div>
     </div>
 
-    
+
 
 </body>
 

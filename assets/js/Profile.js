@@ -82,6 +82,18 @@ const setupButtons = (userName, email) => {
     }
 };
 
+export async function loadUserProfile(email) {
+    try {
+        const user = await fetchData(`users/${email}`);
+        if (user) {
+            updateUserProfile(user);
+            await updateStats(user);
+            setupButtons(user.userName, user.email);
+        }
+    } catch (error) {
+        console.error('Error al cargar el perfil del usuario:', error);
+    }
+}
 
 
 document.addEventListener('DOMContentLoaded', async () => {

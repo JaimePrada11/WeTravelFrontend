@@ -55,7 +55,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         
         localStorage.setItem('user', JSON.stringify(userInfo));
 
-        window.location.href = '/pages/feed.html';
+        window.location.href = '/pages/main.html';
         alert('Login successful');
     } catch (error) {
         console.error('Error:', error);

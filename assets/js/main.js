@@ -1,3 +1,4 @@
+import { loadUserProfile } from './Profile.js';
 import { timeAgo, fetchData, postData, deleteData } from './utils.js';
 
 
@@ -7,7 +8,7 @@ export async function loadMyPost(email) {
     try {
         const data = await fetchData(`post/user/${email}`);
         if (data) {
-            document.getElementById('post-container').innerHTML = '';
+            document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
     } catch (error) {
@@ -15,14 +16,14 @@ export async function loadMyPost(email) {
     }
 }
 
-
 export async function loadLikePost(email) {
     if (!email) return
 
     const data = await fetchData(`post/liked/${email}`);
     if (data) {
         document.getElementById('follows-container').innerHTML = "";
-            document.getElementById('post-container').innerHTML = "";
+        document.getElementById('main-container').innerHTML = "";
+
         data.forEach((post, index) => renderPost(post, index));
     }
 }
@@ -41,7 +42,7 @@ export async function loadFollowers(userName) {
 
         if (data) {
             document.getElementById('follows-container').innerHTML = "";
-            document.getElementById('post-container').innerHTML = "";
+            document.getElementById('main-container').innerHTML = "";
             data.forEach((user, index) => renderUsers(user, index));
         }
     } catch (error) {
@@ -53,8 +54,8 @@ export async function loadFollowing(userName) {
     try {
         const data = await fetchData(`follow/following/${userName}`);
         if (data) {
+            document.getElementById('main-container').innerHTML = "";
             document.getElementById('follows-container').innerHTML = "";
-            document.getElementById('post-container').innerHTML = "";
             data.forEach((user, index) => renderUsers(user, index));
         }
     } catch (error) {
@@ -77,7 +78,29 @@ export async function CheckFollow(userName, currentUser) {
     }
 }
 
+export async function loadPosts() {
+    try {
+        const data = await fetchData(`post`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
 
+export async function followedPost(email) {
+    try {
+        const data = await fetchData(`post/my/${email}`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
 
 export function renderUsers(user) {
     const template = document.getElementById('UserTemplate');
@@ -93,7 +116,7 @@ export function renderUsers(user) {
     const currentUser = JSON.parse(localStorage.getItem('user'))?.userName;
 
     if (currentUser) {
-        const result =  CheckFollow(user.userName, currentUser);
+        const result = CheckFollow(user.userName, currentUser);
 
         if (result) {
             followButton.textContent = "Unfollow";
@@ -107,10 +130,22 @@ export function renderUsers(user) {
     });
 
 
-    document.getElementById('follows-container').appendChild(clone);
+    document.getElementById('main-container').appendChild(clone);
+}
+
+function toggleVisibility(element, show) {
+    if (show) {
+        element.classList.remove('hidden');
+    } else {
+        element.classList.add('hidden');
+    }
 }
 
 
+const profileContainer = document.getElementById('profile-container');
+const feedContainer = document.getElementById('feed-container');
+const homeLink = document.getElementById('home-link');
+const profileLink = document.getElementById('profile-link');
 
 export function renderPost(data, index) {
     if (!data || !data.showPostDTO || !data.showPostDTO.user) return;
@@ -159,7 +194,7 @@ export function renderPost(data, index) {
     }
 
     fragment.appendChild(clone);
-    document.getElementById('post-container').appendChild(fragment);
+    document.getElementById('main-container').appendChild(fragment);
 }
 
 export function renderTags(data) {
@@ -178,9 +213,44 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMyPost(email);
     loadLikePost(email)
     loadTags();
+    followedPost(email)
+
+
+    window.addEventListener('load', () => {
+        toggleVisibility(profileContainer, false);
+        toggleVisibility(feedContainer, true);
+        toggleVisibility(profileLink, true);
+        toggleVisibility(homeLink, false);
+    });
+
+    if (homeLink) {
+        homeLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, true);
+            toggleVisibility(profileLink, true);
+        });
+    }
+
+    if (profileLink) {
+        profileLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, true);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(homeLink, true);
+        });
+    }
+
+
 });
 
-function handleUserClick(user) {
-    window.location.href = `profile.html?email=${encodeURIComponent(user.email)}`;
-}
 
+async function handleUserClick(user) {
+    try {
+        await loadUserProfile(user.email); 
+        toggleVisibility(profileContainer, true); 
+        toggleVisibility(feedContainer, false);
+        toggleVisibility(homeLink, true); 
+        toggleVisibility(profileLink, false); 
+    } catch (error) {
+        console.error('Error al manejar el clic del usuario:', error);
+    }
+}
