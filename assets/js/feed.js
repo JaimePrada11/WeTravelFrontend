@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderPost(data, index) {
-        const template = document.getElementById('post-template');
+const template = document.getElementById('post-templa        te');
         const clone = template.content.cloneNode(true);
 
         const postDTO = data.showPostDTO;

@@ -10,11 +10,10 @@
     <link rel="stylesheet" href="../assets/styles/feed.css">
     <link rel="stylesheet" href="../assets/styles/Notification.css">
     <!-- <script src="./feed.js"></script> -->
-    <script src="../assets/js/notification.js"></script>
+    <script src="../assets/js/notification.js "defer></script>
 </head>
 
 <body>
-
     <aside class="sidebar">
         <nav>
             <ul class="nav-list">
@@ -50,23 +49,86 @@
         <h2>Notifications</h2>
 
         <section class="NotificationContent">
-            <div class="notification_comment">
-
-
+            <div id="myModal" class="ModalPost">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div id="modaledit">
+                        <div class="form-container">
+                            <form id="myForm">
+                              <label for="description">Share your dreams</label>
+                              <textarea id="description" placeholder="Description" name="description" maxlength="200" required></textarea>
+                          
+                              <label for="tags">Tags:</label>
+                              <input type="text" id="tags" name="tags" placeholder="Ejemplo: #Viajes1#Bogota" required>
+                          
+                              <label for="mainLink">Photo</label>
+                              <input type="url" id="mainLink" placeholder="Photo 1" name="mainLink" required>
+                          
+                              <label for="optionalLink1">Photo</label>
+                              <input type="url" id="optionalLink1" placeholder="Photo 2" name="optionalLink1">
+                          
+                              <label for="optionalLink2">Photo</label>
+                              <input type="url" id="optionalLink2" placeholder="Photo 3" name="optionalLink2">
+                          
+                              <button type="submit">Post</button>
+                            </form>
+                          </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="notification_follow">
-
-            </div>
-            <div class="notification_like">
-
-            </div>
-
+            <button class="editprofile" id="openModal">Post</button>
         </section>
 
 
 
-
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
+              
+                <div class="user-details">
+                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> Ha comenzado a seguirte</span></h2>
+                    <p class="user-handle" id="template2-handle">@USUARIO</p>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Seguir</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Check</button>
+            </div>
+        </div>
+    
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
+                <div class="user-details">
+                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has given you a like </span></h2>
+                    <p class="user-handle" id="template2-handle">@USUARIO</p>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Post</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Check</button>
+            </div>
+        </div>
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
+                <div class="user-details">
+                    <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has made a comment </span></h2>
+                    <p class="user-handle" id="template2-handle">@USUARIO</p>
+                </div>
+                
+            </div>
+            <div class="action-button">
+                <button class="follow-button"> Post</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Check</button>
+            </div>
+        </div>
 
        
     
@@ -92,8 +154,6 @@
             <h2>@2025 WeTravel</h2>
         </footer>
     </aside>
-
-
 
 
 </body>
@@ -123,6 +183,11 @@
 </template>
 
 
+
+
+
+
+
 <template id="Noti-like-template">
         <div class="notification-card">
             <div class="user-info">
@@ -141,14 +206,14 @@
         </div>
     </template>
 
-
+<!-- Comment template -->
 
     <template id="Noti-comment-template">
     <div class="notification-card">
         <div class="user-info">
             <img src="" alt="User Profile" class="profile-img" id="template2-profile-img">
             <div class="user-details">
-                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span> has made a comment </span></h2>
+                <h2 class="user-name" id="template2-name">NOMBRE_DEL_USUARIO <span > has made a comment </span> <span id="hora" > </span></h2>
                 <p class="user-handle" id="template2-handle">@USUARIO</p>
             </div>
             

@@ -84,13 +84,7 @@ body {
     padding-top: 60px;
 }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
+
 
 .close {
     color: #aaa;
@@ -294,14 +288,7 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
-    background-color: white;
-    margin: 15% auto;
-    padding: 20px;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 10px;
-}
+
 
 .close {
     float: right;
