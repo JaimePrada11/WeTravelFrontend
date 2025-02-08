@@ -24,7 +24,7 @@ async function loadForYouNotificationsByUsername() {
 async function renderNotificsation() {
 
     const data = await loadForYouNotificationsByUsername();
-    // console.log(data)
+    console.log(data)
     data.forEach(element => {
 
         // if (element.status === true) {
@@ -42,7 +42,7 @@ async function renderNotificsation() {
         if(element.tipo === 'Follow'){
             loadNotificationfollow(element);
        
-            console.log(element)
+            // console.log(element)
         }})
     };
 
@@ -101,7 +101,7 @@ async function loadNotificationfollow(element) {
 
 async function changeNotifcationstatus(id) {
     try {
-        console.log(id);
+        // console.log(id);
         const response = await postData(`notifications/read/${id}`);
 
         // Imprimir la respuesta original para depurar
@@ -117,6 +117,12 @@ async function changeNotifcationstatus(id) {
 }
 
 
+
+async function openEditModal(postId) {
+    await loadPostData(postId);
+    // Tu lógica para abrir el modal
+    document.getElementById('myModal').style.display = 'block';
+}
 
 
 
@@ -170,12 +176,14 @@ document.addEventListener("DOMContentLoaded", function () {
 //  esto es parte crea el DTO  CREATEDTO  necesario para crear un post 
 async function handleFormSubmit(event) {
     event.preventDefault(); // Evita la recarga de la página
-
+    const postId = document.getElementById("postId").value;
     const description = document.getElementById("description").value.trim();
     const tagsInput = document.getElementById("tags").value.trim();
     const mainLink = document.getElementById("mainLink").value.trim();
     const optionalLink1 = document.getElementById("optionalLink1").value.trim();
     const optionalLink2 = document.getElementById("optionalLink2").value.trim();
+
+ 
 
     if (!description || !tagsInput || !mainLink) {
         console.warn("Error: Faltan campos obligatorios.");
@@ -200,8 +208,18 @@ async function handleFormSubmit(event) {
         listPhoto: photos
     };
 
+    if (postId) {
+        await PutPostfunction(postId, createPostDTO);
+    } else {
+        await PostPostfunction(createPostDTO);
+    }
+
+    event.target.reset();
+    document.getElementById("postId").value = '';
     console.log("Datos enviados:", createPostDTO);
     PostPostfunction(createPostDTO);
+
+ 
     return createPostDTO;
 }
 
@@ -231,22 +249,50 @@ async function PostPostfunction(createPostDTO) {
         console.error('Error Creating your post:', error);
     }
 
-    async function loadPostData(postId) {
-        try {
-            const post = await fetchData(`post/${postId}`);
-            
-            // Rellenar campos del formulario
-            document.getElementById('postId').value = post.id;
-            document.getElementById('description').value = post.description;
-            document.getElementById('tags').value = post.listTag.map(tag => `#${tag}`).join('');
-            document.getElementById('mainLink').value = post.listPhoto[0] || '';
-            document.getElementById('optionalLink1').value = post.listPhoto[1] || '';
-            document.getElementById('optionalLink2').value = post.listPhoto[2] || '';
-            
-        } catch (error) {
-            console.error('Error cargando post:', error);
+    
+}
+
+async function PutPostfunction(postId, updatePostDTO) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const response = await putData(`post/${postId}`, updatePostDTO);
+        
+        if (!response.ok) {
+            throw new Error('Update post failed');
         }
+        return response;
+    } catch (error) {
+        console.error('Error updating post:', error);
     }
 }
 
 
+
+async function loadPostData(postId) {
+    try {
+        const post = await fetchData(`post/postid/${postId}`);
+        console.log("Respuesta completa:", post);
+        // Rellenar campos del formulario
+        document.getElementById('postId').value = post?.showPostDTO?.postid || '';
+        document.getElementById('description').value = post?.showPostDTO?.description || '';
+
+
+
+        const tags = post?.tagDTO?.map(tag => tag.tagContent) || [];
+        document.getElementById('tags').value = tags.map(tag => `#${tag}`).join('');
+
+
+        const photos = post?.photoDTOurl?.map(photo => photo.url) || [];
+
+
+                document.getElementById('mainLink').value = photos[0] || '';
+        document.getElementById('optionalLink1').value = photos[1] || '';
+        document.getElementById('optionalLink2').value = photos[2] || '';
+
+        
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
+
+loadPostData(10) 
