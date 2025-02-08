@@ -52,6 +52,25 @@
     </template>
 
 
+    <template id="UserTemplate">
+        <div class="people">
+            <div class="user-info">
+                <img src="" id="photo">
+                <div class="user-details">
+                    <h2 class="user-name" id="name">NOMBRE_DEL_USUARIO </h2>
+                    <p class="user-handle" id="username">@USUARIO</p>
+                    <p class="user-bio" id="bio">BIO_DEL_USUARIO</p>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="follow-button" id="follow">Seguir</button>
+            </div>
+            
+        </div>
+    </template>
+    
+    
+
     <template id="tags-template">
         <div class="tag-card">
             <div class="tag-content">
@@ -60,6 +79,62 @@
                     <p class="tag-usage" id="tagstemplateposts">veces usadas</p>
                 </div>
                 <ion-icon name="ellipsis-vertical-outline" class="tag-icon"></ion-icon>
+            </div>
+        </div>
+    </template>
+
+    <template id="editProfile">
+        <div class="container">
+            <div class="settings-header">
+                <h2 class="title-setting">Profile Settings</h2>
+                <p class="text-settings">Configure your account settings</p>
+            </div>
+            <div class="settings-form">
+                <form id="edit-form">
+                    <div class="personal-info">
+                        <div class="profile-pic">
+                            <img id="current-profilepic"
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s"
+                                alt="Profile Picture">
+                            <button type="button" class="remove-pic" onclick="toggleInput()">x</button>
+                        </div>
+                        <div class="input-group">
+                            <label for="profile-pic-url" class="hidden">New profile picture URL:</label>
+                            <input type="text" id="profile-pic-url" class="hidden"
+                                placeholder="Enter new profile picture URL" oninput="updateProfilePic()">
+                        </div>
+                        <h1>Personal Information</h1>
+                        <div class="input-group">
+                            <label for="name">Name:</label>
+                            <input type="text" id="nameedit">
+                        </div>
+                        <div class="input-group">
+                            <label for="text">Biography:</label>
+                            <input type="text" id="biographyedit">
+                        </div>
+                    </div>
+                    <div class="security">
+                        <button type="button" id="accordion-button" class="accordion-button"
+                            onclick="toggleAccordion()">Security</button>
+                        <div id="accordion-content" class="accordion-content">
+                            <div class="input-group">
+                                <label for="last-password">Old Password:</label>
+                                <input type="password" id="last-password">
+                            </div>
+                            <button type="button" class="update-button" onclick="validatePassword()">Validate
+                                Password</button>
+                            <div class="input-group">
+                                <label for="new-password" class="hidden">New Password:</label>
+                                <input type="password" id="new-password" class="hidden">
+                            </div>
+                            <div class="input-group">
+                                <label for="repeat-password" class="hidden">Repeat Password:</label>
+                                <input type="password" id="repeat-password" class="hidden">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="update-button">Update Profile</button>
+                </form>
             </div>
         </div>
     </template>
@@ -92,7 +167,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="./Feed.html">
-                    <ion-icon class="icon" name="home"></ion-icon> Home</a>
+                        <ion-icon class="icon" name="home"></ion-icon> Home</a>
                 </li>
 
                 <li class="nav-item">
@@ -115,7 +190,9 @@
     </aside>
 
 
-    <main class="main-content" >
+    <main class="main-content">
+
+
         <div class="profile">
             <div class="profile-container">
                 <div class="profile-header">
@@ -133,6 +210,9 @@
                     </div>
                     <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
                         class="profile-image" id="photo">
+                </div>
+                <div>
+                    <button class="editprofile" id="openModal">Edit</button>
                 </div>
 
                 <div class="line"></div>
@@ -155,14 +235,15 @@
 
         <div class="button-container">
             <a class="button post-button selected"> <ion-icon name="library-outline"></ion-icon> Post</a>
-                <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</a>
+            <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</a>
         </div>
 
 
         <div id="post-container" class="post-container">
+            
 
+        </div><div id="follows-container"></div>
 
-        </div>
     </main>
 
     <aside class="sidebar-right">
@@ -182,6 +263,15 @@
             <h2>@2025 WeTravel</h2>
         </footer>
     </aside>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modaledit"></div>
+        </div>
+    </div>
+
+    
 
 </body>
 

@@ -442,6 +442,242 @@ main{
 
 }
 
+.container {
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.settings-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.title-setting {
+    margin: 0;
+    font-size: 28px;
+    color: #333;
+}
+
+.text-settings {
+    margin: 0;
+    color: #6c757d;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.personal-info,
+.security {
+    margin-bottom: 30px;
+}
+
+.profile-pic {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.profile-pic img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dee2e6;
+}
+
+.profile-pic .remove-pic {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.input-group label.hidden,
+.input-group input.hidden {
+    display: none;
+}
+
+.input-group input {
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.input-group input#profile-pic-url,
+.input-group label[for="profile-pic-url"] {
+    display: none;
+}
+
+.input-group input#profile-pic-url.visible,
+.input-group label[for="profile-pic-url"].visible {
+    display: block;
+}
+
+.input-group input#new-password,
+.input-group input#repeat-password,
+.input-group label[for="new-password"],
+.input-group label[for="repeat-password"] {
+    display: none;
+}
+
+.input-group input.visible,
+.input-group label.visible {
+    display: block;
+}
+
+.input-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+.update-button {
+    padding: 12px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.update-button:hover {
+    background-color: #218838;
+}
+
+.accordion-button {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    padding: 12px;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 18px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-button:hover {
+    background-color: #0056b3;
+}
+
+.accordion-button::after {
+    content: '\25bc';
+    float: right;
+}
+
+.accordion-button.active::after {
+    content: '\25b2';
+}
+
+.accordion-content {
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.accordion-content.visible {
+    display: block;
+}
+
+/* CSS para UserTemplate inspirado en Twitter */
+.people {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e1e8ed;
+    transition: background-color 0.3s ease;
+}
+
+.people:hover {
+    background-color: #f5f8fa;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #14171a;
+}
+
+.user-handle {
+    font-size: 14px;
+    color: #657786;
+}
+
+.user-bio {
+    font-size: 14px;
+    color: #657786;
+}
+
+.action-button .follow-button {
+    background-color: #1da1f2;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-button .follow-button:hover {
+    background-color: #0d95e8;
+}
+
+
 @media screen and (max-width: 768px) {
     .sidebar-right,
     .sidebar {
@@ -521,3 +757,5 @@ main{
 .selected {
     font-weight: bold;
 }
+
+
