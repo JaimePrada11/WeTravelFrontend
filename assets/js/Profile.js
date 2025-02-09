@@ -1,4 +1,4 @@
-import { loadLikePost, loadMyPost, loadFollowers, loadFollowing } from './main.js';
+import { loadLikePost, loadMyPost, loadFollowers, loadFollowing, loadgallery } from './main.js';
 import { fetchData } from './utils.js';
 
 const localUser = JSON.parse(localStorage.getItem('user'));
@@ -32,24 +32,17 @@ const showError = (message) => {
     console.error(message);
 };
 
-const setupButtons = (userName, email) => {
+const handleButtonClick = (button, action) => {
     const buttons = document.querySelectorAll('.button');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    button.classList.add('selected');
+    action();
+};
 
-    const handleButtonClick = (button, action) => {
-        buttons.forEach(btn => btn.classList.remove('selected'));
-        button.classList.add('selected');
-        action();
-    };
-
-    buttons.forEach(button => {
-        const newButton = button.cloneNode(true);
-        button.replaceWith(newButton);
-
-    });
-
-
+const setupButtons = (userName, email) => {
     const forYouButton = document.querySelector('.post-button');
     const likesButton = document.querySelector('.likes-button');
+    const gallery = document.querySelector('.photo-button');
     const followersButton = document.querySelector('#myfollowers');
     const followingButton = document.querySelector('#myfollowed');
 
@@ -73,6 +66,11 @@ const setupButtons = (userName, email) => {
             handleButtonClick(followingButton, () => loadFollowing(userName)));
     }
 
+    if (gallery) {
+        gallery.addEventListener('click', () =>
+            handleButtonClick(gallery, () => loadgallery(email)));
+    }
+
     if (forYouButton) {
         handleButtonClick(forYouButton, () => loadMyPost(email));
     }
@@ -81,23 +79,34 @@ const setupButtons = (userName, email) => {
 
 export async function loadUserProfile(email) {
     try {
+        console.log(`Cargando perfil para: ${email}`);
         const user = await fetchData(`users/${email}`);
+        console.log('Usuario cargado:', user);
+
         if (user) {
             updateUserProfile(user);
             await updateStats(user);
             setupButtons(user.userName, user.email);
+        } else {
+            showError('El usuario no se encontró.');
         }
     } catch (error) {
         showError('Error al cargar el perfil del usuario.');
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const email = new URLSearchParams(window.location.search).get('email') || (localUser && localUser.email);
+        const urlParams = new URLSearchParams(window.location.search);
+        let email = urlParams.get('email');
+
+        if (!email && localUser) {
+            email = localUser.email;  // Solo usa localStorage si no hay email en la URL
+        }
         if (email) {
             await loadUserProfile(email);
-            console.log(email)
+            console.log(email);
         } else {
             showError('No se encontró el usuario local o el email proporcionado.');
         }

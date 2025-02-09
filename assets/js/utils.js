@@ -66,6 +66,27 @@ export async function putData(endpoint, data) {
     }
 }
 
+export async function patchData(endpoint, data) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${URL}${endpoint}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error en patchData:', error);
+        throw error;
+    }
+}
 
 
 export async function deleteData(endpoint) {
@@ -83,7 +104,6 @@ export async function deleteData(endpoint) {
             throw new Error(`Error en la solicitud: ${response.status}`);
         }
 
-        // Si la respuesta tiene contenido, parseamos JSON; si no, devolvemos null
         const text = await response.text();
         return text ? JSON.parse(text) : null;
         

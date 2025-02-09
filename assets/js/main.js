@@ -1,6 +1,18 @@
 import { loadUserProfile } from './Profile.js';
-import { timeAgo, fetchData, postData, deleteData } from './utils.js';
+import { timeAgo, fetchData, postData, deleteData, putData, patchData } from './utils.js';
 
+
+function clearLocalStorage() {
+    localStorage.clear();
+    console.log("El localStorage ha sido borrado.");
+}
+
+const logoutButton = document.getElementById('logout-button');
+if (logoutButton) {
+    logoutButton.addEventListener('click', function () {
+        clearLocalStorage();
+    });
+}
 
 export async function loadDataUserForm() {
     try {
@@ -122,9 +134,9 @@ async function changeNotifcationstatus(id) {
     }
 }
 
-export async function loadComments(idComent) {
+export async function loadComment(idComent) {
     try {
-        const data = await postData(`findId/${idComent}`);
+        const data = await fetchData(`comment/findId/${idComent}`);
 
 
     } catch (error) {
@@ -132,10 +144,10 @@ export async function loadComments(idComent) {
     }
 }
 
-export async function CommentPost(email, idPost) {
+export async function CommentPost(email, idPost, comment) {
     if (!email) return;
     try {
-        const data = await postData(`comment/${email}/${idPost}`);
+        const data = await postData(`comment/${email}/${idPost}`, comment);
 
 
     } catch (error) {
@@ -143,11 +155,44 @@ export async function CommentPost(email, idPost) {
     }
 }
 
+async function handleFormSubmit(event) {
+    event.preventDefault();
 
-export async function UpdateComment(email, idPost) {
-    if (!email) return;
+    const commentForm = event.target;
+    const content = commentForm.querySelector(".comment-text").value.trim();
+    const postId = commentForm.dataset.postId;
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+    if (!content) {
+        console.warn("Error: Faltan datos para publicar el comentario.");
+        return;
+    }
+
     try {
-        const data = await postData(`comment/${email}/${idPost}`);
+        console.log(description.dataset.commentId)
+        if (description.dataset.commentId) {
+            await UpdateComment(description.dataset.commentId, content);
+        } else {
+            await CommentPost(currentUser.email, postId, content);
+        }
+
+        loadMyPost()
+
+        document.getElementById("description").value = "";
+    } catch (error) {
+        console.error("Error al manejar el comentario:", error);
+    }
+
+    commentForm.querySelector(".comment-text").value = "";
+
+}
+
+
+
+
+export async function UpdateComment(idPost, newData) {
+    try {
+        const data = await patchData(`comment/${idPost}`, newData);
 
 
     } catch (error) {
@@ -158,7 +203,7 @@ export async function UpdateComment(email, idPost) {
 
 export async function deleteComment(idComment) {
     try {
-        const data = await postData(`comment/${idComment}`);
+        const data = await deleteData(`comment/${idComment}`);
 
 
     } catch (error) {
@@ -277,6 +322,35 @@ export async function loadFollowing(userName) {
     }
 }
 
+export async function loadgallery(email) {
+    try {
+        const data = await fetchData(`photo/user/${email}`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = "";
+            document.getElementById('follows-container').innerHTML = "";
+            console.log(data);
+
+
+            const galleryContainer = document.createElement('div');
+            galleryContainer.classList.add('gallery-grid');
+
+            data.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = image.url;
+                imgElement.alt = 'Imagen de la galería';
+                imgElement.classList.add('gallery-img');
+
+                galleryContainer.appendChild(imgElement);
+            });
+
+            document.getElementById('main-container').appendChild(galleryContainer);
+        }
+    } catch (error) {
+        console.error('Error al cargar los seguidos:', error);
+    }
+}
+
+
 
 export async function CheckFollow(userName, currentUser) {
     try {
@@ -307,8 +381,11 @@ export async function loadPosts() {
 
 export async function followedPost(email) {
     try {
-        console.log(email)
+        console.log('Cargando publicaciones de los seguidos...');
         const data = await fetchData(`post/my/${email}`);
+
+        console.log('Datos obtenidos de seguidos:', data);
+
         if (data) {
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
@@ -317,6 +394,7 @@ export async function followedPost(email) {
         console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
+
 
 export function renderUsers(user) {
     const template = document.getElementById('UserTemplate');
@@ -383,8 +461,37 @@ export function renderComments(comments, container) {
         const clone = template.content.cloneNode(true);
         const currentUser = JSON.parse(localStorage.getItem('user'));
 
-        clone.querySelector('#profile-pic').src = data.userProfilePhoto || "default-avatar.jpg";
-        clone.querySelector('#name').textContent = data.userName || "Usuario desconocido";
+        clone.querySelector('#profile-pic').src = data.userProfilePhoto;
+        clone.querySelector('#handle').textContent = `@${data.userName}`;
+        clone.querySelector('#name').textContent = data.name;
+        clone.querySelector('#hour').textContent = timeAgo(data.createDate);
+
+        clone.querySelector('#name').addEventListener('click', () => {
+            handleUserClick(userName);
+        });
+
+        if (currentUser.userName === data.userName) {
+            console.log(currentUser)
+            const editButton = document.createElement('button');
+            editButton.textContent = "Editar";
+            editButton.classList.add('edit-button');
+            editButton.addEventListener('click', () => {
+                UpdateComment(data.idComment, data.content);
+            });
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Eliminar";
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', async () => {
+                await deleteComment(data.idComment);
+
+            });
+
+            clone.querySelector('.comment-footer').appendChild(editButton);
+            clone.querySelector('.comment-footer').appendChild(deleteButton);
+
+        }
+
         clone.querySelector('#content').textContent = data.content || "";
 
         const likesCount = data.likes ? data.likes.length : 0;
@@ -453,11 +560,19 @@ export function renderPost(data, index) {
         handleUserClick(user);
     });
     const commentSection = clone.querySelector('#comments-section');
-    clone.querySelector('#comment-button').addEventListener('click', () => {
-        console.log(data.commentDTO)
-        renderComments(data.commentDTO, commentSection);
+    const commentButton = clone.querySelector('#comment-button');
+
+    commentButton.addEventListener('click', () => {
+        commentSection.classList.toggle('hidden');
+        if (!commentSection.classList.contains('hidden')) {
+            renderComments(data.commentDTO, commentSection);
+        }
     });
 
+    const commentForm = clone.querySelector('#createcomment');
+    commentForm.dataset.postId = postDTO.postid;
+
+    commentForm.addEventListener("submit", handleFormSubmit);
 
     const hashtagsContainer = clone.querySelector('#hashtags-container');
     data.tagDTO.forEach(tag => {
@@ -529,11 +644,37 @@ export function renderTags(data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    var modal = document.getElementById("myModal");
+    var openModal = document.getElementById("openModal");
+
+    openModal.addEventListener('click', function () {
+        modal.style.display = "block";
+    });
+
+    var span = document.getElementsByClassName("close")[0];
+
+    span.addEventListener('click', function () {
+        modal.style.display = "none";
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
+
+
+
+
     const handleUserClick = (email) => {
+        followedPost(email);
+        followedPost(email);
         loadMyPost(email);
         loadLikePost(email);
         loadTags();
-        followedPost(email);
+        loadgallery(email)
+
     };
 
     const localUser = JSON.parse(localStorage.getItem('user'));
@@ -559,6 +700,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleVisibility(mainContainer, true)
             toggleVisibility(notificationsContainer, false)
 
+            loadPosts();
+
         });
     }
 
@@ -569,6 +712,11 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleVisibility(notificationsContainer, false)
             toggleVisibility(mainContainer, true)
 
+            const localUser = JSON.parse(localStorage.getItem('user'));
+            if (localUser && localUser.email) {
+                loadMyPost(localUser.email);
+                loadLikePost(localUser.email);
+            }
 
         });
     }
@@ -602,19 +750,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-
 async function handleUserClick(user) {
     try {
-        console.log(user)
         await loadUserProfile(user.email);
         toggleVisibility(profileContainer, true);
         toggleVisibility(feedContainer, false);
         toggleVisibility(homeLink, true);
         toggleVisibility(profileLink, true);
-        toggleVisibility(notificationsContainer, false)
-        toggleVisibility(mainContainer, true)
-        toggleVisibility(searchContainer, false)
+        toggleVisibility(notificationsContainer, false);
+        toggleVisibility(mainContainer, true);
+        toggleVisibility(searchContainer, false);
 
+        window.scrollTo(0, 0);
 
     } catch (error) {
         console.error('Error al manejar el clic del usuario:', error);

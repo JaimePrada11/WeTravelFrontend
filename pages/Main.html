@@ -48,7 +48,23 @@
                         <p id="likes-count">NUM_LIKES</p>
                     </div>
                 </div>
-                <div id="comments-section"></div>
+                <div id="comments">
+                    <form id="createcomment">
+                        <div class="post-box">
+                            <div class="user-input">
+                                <div class="profile-pic">
+                                    <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"
+                                        alt="User profile" id="profileimagesearch" />
+                                </div>
+                                <textarea id="comment-text" class="comment-text" rows="1"
+                                    placeholder="What's on your mind?"></textarea>
+                                <button type="submit">Send</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="comments-section"></div>
+                </div>
             </div>
         </div>
     </template>
@@ -186,6 +202,7 @@
                     <h2 class="name" id="name">NOMBRE_DEL_USUARIO</h2>
                     <p class="handle" id="handle">@USUARIO</p>
                 </div>
+                <p id="hour"></p>
             </div>
             <p class="comment-text" id="content">CONTENIDO_DEL_COMENTARIO</p> <!-- Eliminar el id duplicado -->
             <div class="comment-footer">
@@ -196,8 +213,9 @@
             </div>
         </div>
     </template>
-    
-    
+
+
+
 
 
 
@@ -320,14 +338,28 @@
             </div>
 
             <div class="button-container">
-                <a class="button post-button selected"> <ion-icon name="library-outline"></ion-icon> Post</a>
-                <a class="button likes-button"> <ion-icon name="heart-outline"></ion-icon> Likes</a>
+                <a class="button photo-button"> <ion-icon name="images"></ion-icon> Gallery</a>
+                <a class="button post-button selected"> <ion-icon name="library"></ion-icon> Post</a>
+                <a class="button likes-button"> <ion-icon name="heart"></ion-icon> Likes</a>
             </div>
 
 
         </div>
 
         <div class="feed-container" id="feed-container">
+            <div id="createpost">
+                <div class="post-box">
+                    <div class="user-input">
+                        <div class="profile-pic">
+                            <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"
+                                alt="User profile" id="profileimagesearch" />
+                        </div>
+                        <textarea id="openModal" class="textarea" rows="1"
+                            placeholder="What's on your mind?"></textarea>
+                    </div>
+                </div>
+            </div>
+
             <div class="button-feed">
                 <button id="recomend-button" class="button">Recomendados</button>
                 <button id="following-button" class="button">Seguidos</button>
@@ -370,14 +402,43 @@
         </footer>
     </aside>
 
-    <div id="myModal" class="modal">
+    <div id="profileModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modaledit"></div>
+            <span id="closeModal" class="close">&times;</span>
+            <img id="profileModalImage" class="modal-image" src="" alt="Imagen del perfil">
         </div>
     </div>
 
 
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <div id="modaledit">
+                <div class="form-container">
+                    <form id="myForm">
+                        <label for="description">Share your dreams</label>
+                        <textarea id="description" placeholder="Description" name="description" maxlength="200"
+                            required></textarea>
+
+                        <label for="tags">Tags:</label>
+                        <input type="text" id="tags" name="tags" placeholder="Ejemplo: #Viajes1#Bogota" required>
+
+                        <label for="mainLink">Photo</label>
+                        <input type="url" id="mainLink" placeholder="Photo 1" name="mainLink" required>
+
+                        <label for="optionalLink1">Photo</label>
+                        <input type="url" id="optionalLink1" placeholder="Photo 2" name="optionalLink1">
+
+                        <label for="optionalLink2">Photo</label>
+                        <input type="url" id="optionalLink2" placeholder="Photo 3" name="optionalLink2">
+
+                        <button type="submit">Post</button>
+                        <input type="hidden" id="postId" name="postId">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 

@@ -22,8 +22,9 @@ const setupButtons = (email) => {
     };
 
     const loadFollowersPosts = () => {
-        handleButtonClick(followersButton);
         followedPost(email);
+        handleButtonClick(followersButton);
+        
     };
 
     if (forYouButton) {
