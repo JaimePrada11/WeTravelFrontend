@@ -16,6 +16,112 @@ export async function loadDataUserForm() {
 }
 
 
+async function loadForYouNotificationsByUsername() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'))
+
+        const response = await fetchData(`notifications/${user.userName}`);
+
+        if (response.ok) {
+            throw new Error('Error al obtener los posts de For You');
+        }
+        return response
+    } catch (error) {
+        console.error('Error fetching For You posts:', error);
+    }
+}
+
+async function renderNotificsation() {
+    const data = await loadForYouNotificationsByUsername();
+    console.log(data);
+
+    if (data) {
+        document.getElementById('main-container').innerHTML = "";
+        document.getElementById('follows-container').innerHTML = "";
+        document.getElementById('not').innerHTML = "";
+
+        const unreadNotifications = data.filter(element => !element.status); 
+
+        unreadNotifications.forEach(element => {
+            if (element.tipo === 'Comment') {
+                loadNotificationComment(element);
+            } else if (element.tipo === 'Like') {
+                loadNotificationLike(element);
+            } else if (element.tipo === 'Follow') {
+                loadNotificationfollow(element);
+            }
+        });
+    }
+}
+
+
+async function loadNotificationComment(element) {
+    const template = document.getElementById('Noti-comment-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has made you a comment`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+async function loadNotificationLike(element) {
+    const template = document.getElementById('Noti-like-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has made you a Like`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+async function loadNotificationfollow(element) {
+    const template = document.getElementById('Noti-follow-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has followed you`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+async function changeNotifcationstatus(id) {
+    try {
+        const response = await postData(`notifications/read/${id}`);
+        if (!response.status) {
+            throw new Error('Error al marcar la notificación como leída');
+        }
+
+        const data = await loadForYouNotificationsByUsername();
+        const updatedNotifications = data.map(notification => 
+            notification.idNotification === id 
+            ? { ...notification, status: true } 
+            : notification
+        );
+        
+        renderNotificsation(updatedNotifications);
+
+    } catch (error) {
+        console.error('Error marcando la notificación como leída:', error);
+    }
+}
+
+
 export async function likedPost(email, idPost) {
     if (!email) return;
     try {
@@ -180,18 +286,29 @@ export function renderUsers(user) {
 }
 
 function toggleVisibility(element, show) {
-    if (show) {
-        element.classList.remove('hidden');
+    if (element) {
+        if (show) {
+            element.classList.remove('hidden');
+        } else {
+            element.classList.add('hidden');
+        }
     } else {
-        element.classList.add('hidden');
+        console.error("Elemento no encontrado:", element);
     }
 }
 
 
+
 const profileContainer = document.getElementById('profile-container');
 const feedContainer = document.getElementById('feed-container');
+const notificationsContainer = document.getElementById('notifications-container');
 const homeLink = document.getElementById('home-link');
 const profileLink = document.getElementById('profile-link');
+const notificationsLink = document.getElementById('notifications-link');
+const searchLink = document.getElementById('search-link');
+const searchContainer = document.getElementById('search-container');
+const mainContainer = document.getElementById('main-container');
+
 
 export function renderPost(data, index) {
     if (!data || !data.showPostDTO || !data.showPostDTO.user) return;
@@ -201,7 +318,7 @@ export function renderPost(data, index) {
 
     const postDTO = data.showPostDTO;
     const user = postDTO.user;
-    
+
     const currentUser = JSON.parse(localStorage.getItem('user'));
 
     clone.querySelector('#photo').src = user.photo;
@@ -235,7 +352,7 @@ export function renderPost(data, index) {
     });
 
 
-    
+
     const likeButton = clone.querySelector('#like-button');
 
     const userLike = data.likePostDTO ? data.likePostDTO.find(like => like.userName === currentUser.userName) : null;
@@ -246,7 +363,7 @@ export function renderPost(data, index) {
     } else {
         likeButton.setAttribute('name', 'heart-outline');
     }
-    
+
 
     likeButton.addEventListener('click', async () => {
         try {
@@ -300,20 +417,22 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("No se encontró el usuario local o su email.");
     }
 
-
+    renderNotificsation()
 
     window.addEventListener('load', () => {
         toggleVisibility(profileContainer, false);
         toggleVisibility(feedContainer, true);
-        toggleVisibility(profileLink, true);
-        toggleVisibility(homeLink, false);
+        toggleVisibility(notificationsContainer, false)
+
     });
 
     if (homeLink) {
         homeLink.addEventListener('click', () => {
             toggleVisibility(profileContainer, false);
             toggleVisibility(feedContainer, true);
-            toggleVisibility(profileLink, true);
+            toggleVisibility(mainContainer, true)
+            toggleVisibility(notificationsContainer, false)
+
         });
     }
 
@@ -321,8 +440,37 @@ document.addEventListener('DOMContentLoaded', () => {
         profileLink.addEventListener('click', () => {
             toggleVisibility(profileContainer, true);
             toggleVisibility(feedContainer, false);
-            toggleVisibility(homeLink, true);
+            toggleVisibility(notificationsContainer, false)
+            toggleVisibility(mainContainer, true)
+
+
         });
+    }
+
+    if (notificationsLink) {
+        notificationsLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, true)
+            toggleVisibility(mainContainer, false)
+            toggleVisibility(searchContainer, false)
+
+
+
+        })
+    }
+
+    if (searchLink) {
+        searchLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, false)
+            toggleVisibility(searchContainer, true)
+            toggleVisibility(mainContainer, false)
+
+        })
     }
 
 
@@ -336,7 +484,12 @@ async function handleUserClick(user) {
         toggleVisibility(profileContainer, true);
         toggleVisibility(feedContainer, false);
         toggleVisibility(homeLink, true);
-        toggleVisibility(profileLink, false);
+        toggleVisibility(profileLink, true);
+        toggleVisibility(notificationsContainer, false)
+        toggleVisibility(mainContainer, true)
+        toggleVisibility(searchContainer, false)
+
+
     } catch (error) {
         console.error('Error al manejar el clic del usuario:', error);
     }

@@ -20,6 +20,71 @@ main{
     color: red !important;
 }
 
+.notification-card {
+    display: flex;
+    justify-content: space-between; /* Separa el contenido y el botón */
+    align-items: center;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    background-color: white;
+    margin-bottom: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-details {
+    margin-left: 16px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.user-name span {
+    font-weight: 400;
+}
+
+.user-handle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+}
+
+.follow-button {
+    background-color: #3b83f67c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 1vw;
+}
+
+.follow-button:hover {
+    background-color: #2564eb86;
+}
+
+
+
 .sidebar {
     height: 100vh;
     display: flex;

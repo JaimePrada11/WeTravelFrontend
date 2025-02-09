@@ -156,6 +156,71 @@
 
     </template>
 
+
+    <template id="Noti-follow-template">
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="profile-img">
+                <div class="user-details">
+                    <h2 class="name" id="template2-name">NOMBRE_DEL_USUARIO <span> has given you a like </span>
+                    </h2>
+                    <p class="handle" id="template2-handle">@USUARIO</p>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="follow-button">Seguir</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button" id="checkButon">Check</button>
+            </div>
+        </div>
+    </template>
+
+
+
+
+
+
+
+    <template id="Noti-like-template">
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="profile-img">
+                <div class="user-details">
+                    <h2 class="user-name" id="name">NOMBRE_DEL_USUARIO <span> has given you a like </span>
+                    </h2>
+                    <p class="user-handle" id="handle">@USUARIO</p>
+                </div>
+            </div>
+
+            <div class="action-button">
+                <button class="follow-button" id="checkButon">Check</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Comment template -->
+
+    <template id="Noti-comment-template">
+        <div class="notification-card">
+            <div class="user-info">
+                <img src="" alt="User Profile" class="profile-img" id="profile-img">
+                <div class="user-details">
+                    <h2 class="user-name" id="name">NOMBRE_DEL_USUARIO <span> has made a comment </span> <span
+                            id="hora">qq</span></h2>
+                    <p class="user-handle" id="handle">@USUARIO</p>
+                </div>
+
+            </div>
+            <div class="action-button">
+                <button class="follow-button"> Post</button>
+            </div>
+            <div class="action-button">
+                <button class="follow-button" id="checkButon">Check</button>
+            </div>
+        </div>
+    </template>
+
     <aside class="sidebar">
         <nav>
             <ul class="nav-list">
@@ -167,15 +232,11 @@
                         <ion-icon class="icon" name="home"></ion-icon> Home
                     </a>
                 </li>
-                <li class="nav-item" id="profile-link">
-                    <a href="#">
-                        <ion-icon class="icon" name="person"></ion-icon> Profile
-                    </a>
-                </li>
-                <li class="nav-item">
+
+                <li class="nav-item" id="search-link">
                     <ion-icon class="icon" name="search"></ion-icon> Search
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="notifications-link">
                     <ion-icon class="icon" name="notifications"></ion-icon> Notifications
                 </li>
                 <li class="nav-item" id="logout-button">
@@ -183,7 +244,7 @@
                         <ion-icon class="icon" name="exit"></ion-icon> LogOut
                     </a>
                 </li>
-                <li class="profile">
+                <li class="profile" id="profile-link">
                     <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt=""
                         id="profileimage">
                     <a href="#" id="profile-link">Profile</a>
@@ -256,11 +317,17 @@
 
         </div>
 
+        <div class="notifications-container" id="notifications-container">
+            <h1>Notifications</h1>
+
+            <div id="not"></div>
+        </div>
+
+        <div class="search-container"></div>
+
 
         <div id="main-container"></div>
         <div id="follows-container"></div>
-
-
 
 
     </main>
