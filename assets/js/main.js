@@ -15,6 +15,55 @@ if (logoutButton) {
 }
 
 
+
+async function createPost(createPostDTO) {
+
+    try {
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const email = user.email;
+
+        const response = await postData(`post/${email}`, createPostDTO)
+
+        if (!response.ok) {
+            throw new Error('Creation post is not okay');
+        }
+
+
+        return response
+    } catch (error) {
+        console.error('Error Creating your post:', error);
+    }
+
+
+}
+
+async function updatePost(postId, updatePostDTO) {
+    try {
+        const response = await putData(`post/${postId}`, updatePostDTO);
+
+        if (!response.ok) {
+            throw new Error('Update post failed');
+        }
+        return response;
+    } catch (error) {
+        console.error('Error updating post:', error);
+    }
+}
+
+async function deletePost(postId) {
+    try {
+        const response = await deleteData(`post/${postId}`);
+
+        if (!response.ok) {
+            throw new Error('Update post failed');
+        }
+        return response;
+    } catch (error) {
+        console.error('Error updating post:', error);
+    }
+}
+
 export async function followUser(email) {
     try {
         const currentUser = JSON.parse(localStorage.getItem('user'))
@@ -221,7 +270,72 @@ async function handleFormSubmit(event) {
 }
 
 
+async function handlePostSubmit(event) {
+    event.preventDefault();
+    const postId = document.getElementById("postId").value; // Obtenemos el ID del post
+    const description = document.getElementById("description").value.trim();
+    const tagsInput = document.getElementById("tags").value.trim();
+    const mainLink = document.getElementById("mainLink").value.trim();
+    const optionalLink1 = document.getElementById("optionalLink1").value.trim();
+    const optionalLink2 = document.getElementById("optionalLink2").value.trim();
 
+
+
+    if (!description) {
+        console.warn("Error: Faltan campos obligatorios.");
+        return;
+    }
+
+
+    let tagList = tagsInput.split("#")
+        .map(tag => tag.trim().toLowerCase())
+        .filter(tag => tag);
+
+    tagList = tagList.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1));
+
+    const photos = [mainLink, optionalLink1, optionalLink2].filter(photo => photo);
+
+    const createPostDTO = {
+        description: description,
+        listTag: tagList,
+        listPhoto: photos
+    };
+
+    if (postId) {
+        await updatePost(postId, createPostDTO);
+    } else {
+        await createPost(createPostDTO);
+    }
+
+    event.target.reset();
+    document.getElementById("postId").value = '';
+    console.log("Datos enviados:", createPostDTO);
+
+
+    return createPostDTO;
+}
+
+async function loadPostData(post) {
+    try {
+
+        // Rellenar campos del formulario
+        document.getElementById('postId').value = post.showPostDTO.postid;
+        document.getElementById('description').value = post.showPostDTO.description;
+        const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
+    document.getElementById('tags').value = tags;
+
+    const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
+    console.log(photos)
+
+    document.getElementById('mainLink').value = photos[0] || '';
+    document.getElementById('optionalLink1').value = photos[1] || '';
+    document.getElementById('optionalLink2').value = photos[2] || '';
+
+
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
 
 export async function UpdateComment(idPost, newData) {
     try {
@@ -658,6 +772,31 @@ export function renderPost(data, index) {
     });
 
 
+
+
+    if (user.userName === currentUser.userName) {
+        const editButton = document.createElement('button');
+        editButton.textContent = "Edit";
+        editButton.addEventListener('click', () => {
+            loadPostData(data);
+            document.getElementById('myModal').style.display = 'block';
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener('click', async () => {
+            try {
+                await deletePost(postDTO.postid);
+                await loadPosts();
+            } catch (error) {
+                console.error('Error al eliminar el post:', error);
+            }
+        });
+
+        clone.querySelector('.post-footer').appendChild(editButton);
+        clone.querySelector('.post-footer').appendChild(deleteButton);
+    }
+
     const postcard = clone.querySelector('.postcard');
     if (index % 2 === 0) {
         postcard.classList.add('par');
@@ -680,6 +819,15 @@ export function renderTags(data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    const form = document.getElementById("myForm");
+
+    if (form) {
+        form.addEventListener("submit", handlePostSubmit);
+        console.log("Formulario encontrado y evento añadido.");
+    } else {
+        console.error("Error: No se encontró el formulario.");
+    }
 
     var modal = document.getElementById("myModal");
     var openModal = document.getElementById("openModal");
