@@ -14,6 +14,39 @@ if (logoutButton) {
     });
 }
 
+
+export async function followUser(email) {
+    try {
+        const currentUser = JSON.parse(localStorage.getItem('user'))
+
+        const response = await postData(`follow/ad/${currentUser.email}/${email}`);
+
+        if (response.ok) {
+            throw new Error('Error al obtener los posts de For You');
+        }
+        return response
+    } catch (error) {
+        console.error('Error fetching For You posts:', error);
+    }
+
+}
+
+export async function UnfollowUser(email) {
+    try {
+        const currentUser = JSON.parse(localStorage.getItem('user'))
+
+        const response = await deleteData(`follow/ad/${currentUser.email}/${email}`);
+
+        if (response.ok) {
+            throw new Error('Error al obtener los posts de For You');
+        }
+        return response
+    } catch (error) {
+        console.error('Error fetching For You posts:', error);
+    }
+
+}
+
 export async function loadDataUserForm() {
     try {
         const user = JSON.parse(localStorage.getItem('user'))
@@ -352,11 +385,12 @@ export async function loadgallery(email) {
 
 
 
-export async function CheckFollow(userName, currentUser) {
+export async function CheckFollow(userName) {
     try {
         const followers = await fetchData(`follow/followers/${userName}`);
         const following = await fetchData(`follow/following/${userName}`);
 
+        const currentUser = localStorage.getItem('user').userName;
         const isFollowing = following.some(user => user.userName === currentUser);
         const isFollowedBy = followers.some(user => user.userName === currentUser);
 
@@ -410,10 +444,12 @@ export function renderUsers(user) {
     const currentUser = JSON.parse(localStorage.getItem('user'))?.userName;
 
     if (currentUser) {
-        const result = CheckFollow(user.userName, currentUser);
+        const result = CheckFollow(user.userName);
 
-        if (result) {
+        if (result.isFollowing) {
             followButton.textContent = "Unfollow";
+        } else if (result.isFollowedBy) {
+            followButton.textContent = "Follow";
         } else {
             followButton.textContent = "Follow";
         }
