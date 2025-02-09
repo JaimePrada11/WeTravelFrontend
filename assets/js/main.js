@@ -2,11 +2,24 @@ import { loadUserProfile } from './Profile.js';
 import { timeAgo, fetchData, postData, deleteData } from './utils.js';
 
 
+export async function loadDataUserForm() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (user) {
+            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
+            document.getElementById("name").value = user.name || '';
+            document.getElementById("biography").value = user.biography || '';
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function loadMyPost(email) {
     if (!email) return;
-
     try {
         const data = await fetchData(`post/user/${email}`);
+
         if (data) {
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
@@ -17,16 +30,20 @@ export async function loadMyPost(email) {
 }
 
 export async function loadLikePost(email) {
-    if (!email) return
+    if (!email) return;
 
-    const data = await fetchData(`post/liked/${email}`);
-    if (data) {
-        document.getElementById('follows-container').innerHTML = "";
-        document.getElementById('main-container').innerHTML = "";
-
-        data.forEach((post, index) => renderPost(post, index));
+    try {
+        const data = await fetchData(`post/liked/${email}`);
+        if (data) {
+            document.getElementById('follows-container').innerHTML = "";
+            document.getElementById('main-container').innerHTML = "";
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones que le gustaron al usuario:', error);
     }
 }
+
 
 export async function loadTags() {
     const data = await fetchData('tag/tagDTO');
@@ -37,8 +54,10 @@ export async function loadTags() {
 }
 
 export async function loadFollowers(userName) {
+    console.log(`🔄 Cargando seguidores de: ${userName}`);
     try {
         const data = await fetchData(`follow/followers/${userName}`);
+        console.log(`📢 Datos recibidos:`, data);
 
         if (data) {
             document.getElementById('follows-container').innerHTML = "";
@@ -50,18 +69,21 @@ export async function loadFollowers(userName) {
     }
 }
 
+
 export async function loadFollowing(userName) {
     try {
         const data = await fetchData(`follow/following/${userName}`);
+        console.log(userName);
         if (data) {
             document.getElementById('main-container').innerHTML = "";
             document.getElementById('follows-container').innerHTML = "";
-            data.forEach((user, index) => renderUsers(user, index));
+            data.forEach((user) => renderUsers(user));
         }
     } catch (error) {
         console.error('Error al cargar los seguidos:', error);
     }
 }
+
 
 export async function CheckFollow(userName, currentUser) {
     try {
@@ -92,6 +114,7 @@ export async function loadPosts() {
 
 export async function followedPost(email) {
     try {
+        console.log(email)
         const data = await fetchData(`post/my/${email}`);
         if (data) {
             document.getElementById('main-container').innerHTML = '';
@@ -208,12 +231,20 @@ export function renderTags(data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
-    loadMyPost(email);
-    loadLikePost(email)
-    loadTags();
-    followedPost(email)
+    const handleUserClick = (email) => {
+        loadMyPost(email);
+        loadLikePost(email);
+        loadTags();
+        followedPost(email);
+    };
+
+    const localUser = JSON.parse(localStorage.getItem('user'));
+    if (localUser && localUser.email) {
+        handleUserClick(localUser.email);
+    } else {
+        console.error("No se encontró el usuario local o su email.");
+    }
+
 
 
     window.addEventListener('load', () => {
@@ -245,11 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function handleUserClick(user) {
     try {
-        await loadUserProfile(user.email); 
-        toggleVisibility(profileContainer, true); 
+        console.log(user)
+        await loadUserProfile(user.email);
+        toggleVisibility(profileContainer, true);
         toggleVisibility(feedContainer, false);
-        toggleVisibility(homeLink, true); 
-        toggleVisibility(profileLink, false); 
+        toggleVisibility(homeLink, true);
+        toggleVisibility(profileLink, false);
     } catch (error) {
         console.error('Error al manejar el clic del usuario:', error);
     }
