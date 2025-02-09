@@ -83,6 +83,74 @@ main{
     background-color: #2564eb86;
 }
 
+.comment-container {
+    width: 100%;
+    margin-bottom: 1rem;
+    max-width: 40rem;
+    padding: 1.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.profile-pic {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+}
+
+.user-info {
+    margin-left: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.user-handle {
+    font-size: 0.875rem;
+    color: #6B7280; /* gray-500 */
+}
+
+.comment-text {
+    color: #374151; /* gray-700 */
+    margin-bottom: 1rem;
+}
+
+.comment-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #374151; /* gray-700 */
+}
+
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.like-icon {
+    color: #1E40AF; /* blue-900 */
+    font-size: 2rem;
+    transition: color 0.2s;
+}
+
+.like-section:hover .like-icon {
+    color: #EF4444; /* red-500 */
+}
+
+.like-section:hover {
+    color: #EF4444; /* red-500 */
+}
 
 
 .sidebar {

@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="../assets/styles/Profile.css">
     <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.3/dist/ionicons/ionicons.js"></script>
 
-    <script type="module" src="../assets/js/profile.js"></script>
-    <script type="module" src="../assets/js/feed.js"></script>
+    <script type="module" defer src="../assets/js/profile.js"></script>
+    <script type="module" defer src="../assets/js/feed.js"></script>
 </head>
 
 <body class="profile-page">
@@ -40,7 +40,7 @@
 
                 <div class="post-footer">
                     <div class="comments-section">
-                        <ion-icon name="chatbubble" class="icon" id=""></ion-icon>
+                        <ion-icon name="chatbubble" class="icon" id="comment-button"></ion-icon>
                         <p id="comments-count">NUM_COMENTARIOS</p>
                     </div>
                     <div class="likes-section">
@@ -48,6 +48,7 @@
                         <p id="likes-count">NUM_LIKES</p>
                     </div>
                 </div>
+                <div id="comments-section"></div>
             </div>
         </div>
     </template>
@@ -177,7 +178,26 @@
     </template>
 
 
-
+    <template id="comments">
+        <div class="comment-container">
+            <div class="comment-header">
+                <img src="IMAGEN_DE_PERFIL" alt="Foto de Perfil" class="profile-pic" id="profile-pic">
+                <div class="user-info">
+                    <h2 class="name" id="name">NOMBRE_DEL_USUARIO</h2>
+                    <p class="handle" id="handle">@USUARIO</p>
+                </div>
+            </div>
+            <p class="comment-text" id="content">CONTENIDO_DEL_COMENTARIO</p> <!-- Eliminar el id duplicado -->
+            <div class="comment-footer">
+                <div class="like-section">
+                    <ion-icon name="heart-outline" class="like-icon" id="like-button"></ion-icon>
+                    <p id="likes">NUM_LIKES</p>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    
 
 
 

@@ -40,7 +40,7 @@ async function renderNotificsation() {
         document.getElementById('follows-container').innerHTML = "";
         document.getElementById('not').innerHTML = "";
 
-        const unreadNotifications = data.filter(element => !element.status); 
+        const unreadNotifications = data.filter(element => !element.status);
 
         unreadNotifications.forEach(element => {
             if (element.tipo === 'Comment') {
@@ -53,6 +53,7 @@ async function renderNotificsation() {
         });
     }
 }
+
 
 
 async function loadNotificationComment(element) {
@@ -108,16 +109,60 @@ async function changeNotifcationstatus(id) {
         }
 
         const data = await loadForYouNotificationsByUsername();
-        const updatedNotifications = data.map(notification => 
-            notification.idNotification === id 
-            ? { ...notification, status: true } 
-            : notification
+        const updatedNotifications = data.map(notification =>
+            notification.idNotification === id
+                ? { ...notification, status: true }
+                : notification
         );
-        
+
         renderNotificsation(updatedNotifications);
 
     } catch (error) {
         console.error('Error marcando la notificación como leída:', error);
+    }
+}
+
+export async function loadComments(idComent) {
+    try {
+        const data = await postData(`findId/${idComent}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+export async function CommentPost(email, idPost) {
+    if (!email) return;
+    try {
+        const data = await postData(`comment/${email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+export async function UpdateComment(email, idPost) {
+    if (!email) return;
+    try {
+        const data = await postData(`comment/${email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+export async function deleteComment(idComment) {
+    try {
+        const data = await postData(`comment/${idComment}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
 
@@ -142,6 +187,28 @@ export async function unlikedPost(idLike) {
         console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
+
+export async function likedComment(email, idPost) {
+    if (!email) return;
+    try {
+        const data = await postData(`like/likecomment/${email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+export async function unlikeComment(idLike) {
+    try {
+        const data = await deleteData(`like/${idLike}`);
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
 
 
 export async function loadMyPost(email) {
@@ -183,10 +250,8 @@ export async function loadTags() {
 }
 
 export async function loadFollowers(userName) {
-    console.log(`🔄 Cargando seguidores de: ${userName}`);
     try {
         const data = await fetchData(`follow/followers/${userName}`);
-        console.log(`📢 Datos recibidos:`, data);
 
         if (data) {
             document.getElementById('follows-container').innerHTML = "";
@@ -202,7 +267,6 @@ export async function loadFollowers(userName) {
 export async function loadFollowing(userName) {
     try {
         const data = await fetchData(`follow/following/${userName}`);
-        console.log(userName);
         if (data) {
             document.getElementById('main-container').innerHTML = "";
             document.getElementById('follows-container').innerHTML = "";
@@ -310,6 +374,62 @@ const searchContainer = document.getElementById('search-container');
 const mainContainer = document.getElementById('main-container');
 
 
+export function renderComments(comments, container) {
+    console.log("Comentarios recibidos:", comments);
+    container.innerHTML = "";
+
+    comments.forEach(data => {
+        const template = document.getElementById('comments');
+        const clone = template.content.cloneNode(true);
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+
+        clone.querySelector('#profile-pic').src = data.userProfilePhoto || "default-avatar.jpg";
+        clone.querySelector('#name').textContent = data.userName || "Usuario desconocido";
+        clone.querySelector('#content').textContent = data.content || "";
+
+        const likesCount = data.likes ? data.likes.length : 0;
+        const likesCountElement = clone.querySelector('#likes');
+
+        if (likesCountElement) {
+            likesCountElement.textContent = likesCount;
+        } else {
+            console.warn("Elemento de 'likes' no encontrado en el template");
+        }
+
+        const likeButton = clone.querySelector('#like-button');
+
+        const userLike = data ? data.likes.find(like => like.userName === currentUser.userName) : null;
+
+        if (userLike) {
+            likeButton.setAttribute('name', 'heart');
+            likeButton.classList.add('likebutton');
+        } else {
+            likeButton.setAttribute('name', 'heart-outline');
+        }
+
+        likeButton.addEventListener('click', async () => {
+            try {
+                if (userLike) {
+                    await unlikeComment(userLike.idLike);
+                    likeButton.setAttribute('name', 'heart-outline');
+                } else {
+                    await likedComment(currentUser.email, data.idComment);
+                    likeButton.setAttribute('name', 'heart');
+                }
+                await loadPosts();
+            } catch (error) {
+                console.error('Error al manejar el like/dislike:', error);
+            }
+        });
+
+
+        container.appendChild(clone);
+    });
+}
+
+
+
+
 export function renderPost(data, index) {
     if (!data || !data.showPostDTO || !data.showPostDTO.user) return;
     const template = document.getElementById('post-template');
@@ -332,6 +452,12 @@ export function renderPost(data, index) {
     clone.querySelector('#name').addEventListener('click', () => {
         handleUserClick(user);
     });
+    const commentSection = clone.querySelector('#comments-section');
+    clone.querySelector('#comment-button').addEventListener('click', () => {
+        console.log(data.commentDTO)
+        renderComments(data.commentDTO, commentSection);
+    });
+
 
     const hashtagsContainer = clone.querySelector('#hashtags-container');
     data.tagDTO.forEach(tag => {
