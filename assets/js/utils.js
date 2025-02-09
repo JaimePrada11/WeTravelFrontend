@@ -80,14 +80,19 @@ export async function deleteData(endpoint) {
         });
 
         if (!response.ok) {
-            throw new Error('Error en la solicitud');
+            throw new Error(`Error en la solicitud: ${response.status}`);
         }
-        return await response.json();
+
+        // Si la respuesta tiene contenido, parseamos JSON; si no, devolvemos null
+        const text = await response.text();
+        return text ? JSON.parse(text) : null;
+        
     } catch (error) {
         console.error('Error en deleteData:', error);
         throw error;
     }
 }
+
 
 
 export function timeAgo(creationDate) {

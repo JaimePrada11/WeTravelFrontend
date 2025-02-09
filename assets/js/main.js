@@ -15,6 +15,29 @@ export async function loadDataUserForm() {
     }
 }
 
+
+export async function likedPost(email, idPost) {
+    if (!email) return;
+    try {
+        const data = await postData(`like/likepost/${email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+export async function unlikedPost(idLike) {
+    try {
+        const data = await deleteData(`like/${idLike}`);
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
 export async function loadMyPost(email) {
     if (!email) return;
     try {
@@ -178,6 +201,8 @@ export function renderPost(data, index) {
 
     const postDTO = data.showPostDTO;
     const user = postDTO.user;
+    
+    const currentUser = JSON.parse(localStorage.getItem('user'));
 
     clone.querySelector('#photo').src = user.photo;
     clone.querySelector('#name').textContent = user.name;
@@ -208,6 +233,36 @@ export function renderPost(data, index) {
         imgElement.classList.add('rounded-2xl', 'w-full', 'max-w-sm', 'object-cover');
         imagesContainer.appendChild(imgElement);
     });
+
+
+    
+    const likeButton = clone.querySelector('#like-button');
+
+    const userLike = data.likePostDTO ? data.likePostDTO.find(like => like.userName === currentUser.userName) : null;
+
+    if (userLike) {
+        likeButton.setAttribute('name', 'heart');
+        likeButton.classList.add('likebutton');
+    } else {
+        likeButton.setAttribute('name', 'heart-outline');
+    }
+    
+
+    likeButton.addEventListener('click', async () => {
+        try {
+            if (userLike) {
+                await unlikedPost(userLike.idLike);
+                likeButton.setAttribute('name', 'heart-outline');
+            } else {
+                await likedPost(currentUser.email, postDTO.postid);
+                likeButton.setAttribute('name', 'heart');
+            }
+            await loadPosts();
+        } catch (error) {
+            console.error('Error al manejar el like/dislike:', error);
+        }
+    });
+
 
     const postcard = clone.querySelector('.postcard');
     if (index % 2 === 0) {
