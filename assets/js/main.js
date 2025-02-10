@@ -6,7 +6,8 @@ async function loadPhotos() {
         const data = await fetchData(`users/${currentUser.email}`);
         console.log(data);
 
-        const photo = document.getElementById('photo').src = currentUser.photo;
+        const photo = 
+        document.getElementById('photo').src = currentUser.photo;
 
         const photoElement = document.getElementById('profile-pic-url');
         if (photoElement) {
