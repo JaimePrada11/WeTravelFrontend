@@ -93,24 +93,14 @@ export async function UnfollowUser(email) {
 
 // Verificar si se siguen los usuarios
 export async function CheckFollow(userName) {
-    try {
-        const userData = localStorage.getItem('user');
-        if (!userData) {
-            console.error('No se encontró información del usuario en localStorage.');
-            return false;
-        }
-
-        const localUserName = JSON.parse(userData).userName;
-        console.log('Usuario local:', localUserName);
-
-        const following = await fetchData(`follow/following/${localUserName}`);
-
-        return following.some(user => user.userName === userName);
-    } catch (error) {
-        console.error('Error al verificar el seguimiento:', error);
-        return false;
+    if (followingList && followingList.length > 0) {
+      return followingList.some(user => user.userName === userName);
     }
-}
+    
+    await updateFollowingList();
+    return followingList.some(user => user.userName === userName);
+  }
+  
 
 
 // Cargar los seguidores de un usuario
@@ -165,12 +155,10 @@ async function loadPostTags(tag) {
 // Obtener las notificaciones por usuario
 async function loadForYouNotificationsByUsername() {
     try {
-
+        
         const response = await fetchData(`notifications/${currentUser.userName}`);
-
-        if (!response.ok) {
-            throw new Error('Error al obtener los posts de For You');
-        }
+console.log(response)
+  
         return response
     } catch (error) {
         console.error('Error fetching For You posts:', error);
@@ -398,6 +386,7 @@ export async function loadMyPost(email) {
 
 
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -413,6 +402,7 @@ export async function loadLikePost(email) {
     try {
         const data = await fetchData(`post/liked/${email}`);
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('follows-container').innerHTML = "";
             document.getElementById('main-container').innerHTML = "";
             data.forEach((post, index) => renderPost(post, index));
@@ -428,6 +418,7 @@ export async function loadPosts() {
     try {
         const data = await fetchData(`post`);
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -436,6 +427,7 @@ export async function loadPosts() {
     }
 }
 
+
 // Cargar los post de un usuarios seguidos
 export async function followedPost(email) {
     try {
@@ -443,6 +435,7 @@ export async function followedPost(email) {
 
 
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -773,19 +766,21 @@ export async function loadTags() {
 export async function renderUsers(user) {
     const template = document.getElementById('UserTemplate');
     const clone = template.content.cloneNode(true);
-
+  
     clone.querySelector('#photo').src = user.photo;
     clone.querySelector('#username').textContent = `@${user.userName}`;
     clone.querySelector('#name').textContent = user.name;
     clone.querySelector('#bio').textContent = user.biography;
     
     const followButton = clone.querySelector('#follow');
-
+  
+    // Si el usuario que se muestra es el actual, se oculta el botón
     if (currentUser && currentUser.userName === user.userName) {
         followButton.style.display = 'none';
     } else if (currentUser) {
         try {
-            const isFollowing = await CheckFollow(user.userName);
+            // Usamos la lista local para determinar si ya sigues a este usuario
+            const isFollowing = followingList.some(u => u.userName === user.userName);
             followButton.textContent = isFollowing ? "Unfollow" : "Follow";
         } catch (error) {
             console.error("Error al verificar seguimiento:", error);
@@ -794,16 +789,26 @@ export async function renderUsers(user) {
     } else {
         followButton.style.display = 'none';
     }
-
+  
     followButton.addEventListener('click', async () => {
         followButton.disabled = true;
         try {
-            if (followButton.textContent === "Follow") {
+            // Volvemos a chequear usando la lista local
+            const isFollowing = followingList.some(u => u.userName === user.userName);
+            if (!isFollowing) {
+                // Realizamos la acción de follow
                 await followUser(user.email);
                 followButton.textContent = "Unfollow";
+                // Agregamos el usuario a la lista local si aún no está
+                if (!followingList.some(u => u.userName === user.userName)) {
+                    followingList.push(user);
+                }
             } else {
+                // Realizamos la acción de unfollow
                 await UnfollowUser(user.email);
                 followButton.textContent = "Follow";
+                // Eliminamos el usuario de la lista local
+                followingList = followingList.filter(u => u.userName !== user.userName);
             }
         } catch (error) {
             console.error("Error al cambiar el estado de seguimiento:", error);
@@ -811,14 +816,14 @@ export async function renderUsers(user) {
             followButton.disabled = false;
         }
     });
-
+  
     clone.querySelector('#name').addEventListener('click', () => {
         handleUserClick(user);
     });
-
+  
     document.getElementById('main-container').appendChild(clone);
-}
-
+  }
+  
 
 
 
@@ -997,6 +1002,24 @@ const searchContainer = document.getElementById('search-container');
 const mainContainer = document.getElementById('main-container');
 
 
+let followingList = []; 
+
+console.log(followingList)
+
+async function updateFollowingList() {
+  try {
+    const data = await fetchData(`follow/following/${currentUser.userName}`);
+    followingList = data.reduce((acc, user) => {
+      if (!acc.find(u => u.userName === user.userName)) {
+        acc.push(user);
+      }
+      return acc;
+    }, []);
+  } catch (error) {
+    console.error("Error al actualizar la lista de following:", error);
+  }
+}
+
 
 
 const updateUserProfile = (user) => {
@@ -1031,24 +1054,23 @@ const updateUserProfile = (user) => {
       const followButton = document.createElement('button');
       followButton.classList.add('follow-button');
   
-      CheckFollow(user.userName)
-        .then(isFollowing => {
-          followButton.textContent = isFollowing ? "Unfollow" : "Follow";
-        })
-        .catch(error => {
-          console.error("Error al verificar seguimiento:", error);
-          followButton.textContent = "Follow";
-        });
+      // Verificamos usando la lista local
+      const isFollowing = followingList.some(u => u.userName === user.userName);
+      followButton.textContent = isFollowing ? "Unfollow" : "Follow";
   
       followButton.addEventListener('click', async () => {
         try {
-          if (followButton.textContent === "Follow") {
+          const isFollowing = followingList.some(u => u.userName === user.userName);
+          if (!isFollowing) {
             await followUser(user.email);
             followButton.textContent = "Unfollow";
+            if (!followingList.some(u => u.userName === user.userName)) {
+              followingList.push(user);
+            }
           } else {
-            // Dejar de seguir al usuario
             await UnfollowUser(user.email);
             followButton.textContent = "Follow";
+            followingList = followingList.filter(u => u.userName !== user.userName);
           }
         } catch (error) {
           console.error("Error al cambiar el estado de seguimiento:", error);
