@@ -1,6 +1,28 @@
-import { timeAgo, fetchData, postData, deleteData, putData, patchData } from './utils.js';
+import { timeAgo, fetchData, postData, deleteData, putData } from './utils.js';
 const currentUser = JSON.parse(localStorage.getItem('user'))
 
+async function loadPhotos() {
+    try {
+        const data = await fetchData(`users/${currentUser.email}`);
+        console.log(data);
+
+        const photo = 
+        document.getElementById('photo').src = currentUser.photo;
+
+        const photoElement = document.getElementById('profile-pic-url');
+        if (photoElement) {
+            photoElement.src = data.photo;
+        } else {
+            console.error('Elemento con id "photo" no encontrado.');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+
+// Llamar a la función para cargar las fotos
+loadPhotos();
 
 //Funcion para limpirar el localStorage
 function clearLocalStorage() {
@@ -39,20 +61,22 @@ export async function search(Data) {
 // USERS
 
 //Actualizar usuario
+
 export async function updateUser(newData) {
     try {
-
         const response = await putData(`users/update/${currentUser.email}`, newData);
 
-        if (!response.ok) {
-            throw new Error('Error al obtener los posts de For You');
+        if (!response || !response.ok) {
+            throw new Error('Error al actualizar el usuario');
         }
-        return response
-    } catch (error) {
-        console.error('Error fetching For You posts:', error);
-    }
 
+        return response;
+    } catch (error) {
+        console.error('Error en la actualización del usuario:', error);
+        return null; // Retornar null para evitar fallos en el código que lo usa
+    }
 }
+
 
 
 
@@ -93,24 +117,14 @@ export async function UnfollowUser(email) {
 
 // Verificar si se siguen los usuarios
 export async function CheckFollow(userName) {
-    try {
-        const userData = localStorage.getItem('user');
-        if (!userData) {
-            console.error('No se encontró información del usuario en localStorage.');
-            return false;
-        }
-
-        const localUserName = JSON.parse(userData).userName;
-        console.log('Usuario local:', localUserName);
-
-        const following = await fetchData(`follow/following/${localUserName}`);
-
-        return following.some(user => user.userName === userName);
-    } catch (error) {
-        console.error('Error al verificar el seguimiento:', error);
-        return false;
+    if (followingList && followingList.length > 0) {
+        return followingList.some(user => user.userName === userName);
     }
+
+    await updateFollowingList();
+    return followingList.some(user => user.userName === userName);
 }
+
 
 
 // Cargar los seguidores de un usuario
@@ -167,10 +181,8 @@ async function loadForYouNotificationsByUsername() {
     try {
 
         const response = await fetchData(`notifications/${currentUser.userName}`);
+        console.log(response)
 
-        if (!response.ok) {
-            throw new Error('Error al obtener los posts de For You');
-        }
         return response
     } catch (error) {
         console.error('Error fetching For You posts:', error);
@@ -236,7 +248,7 @@ export async function UpdateComment(idComent, newData) {
     try {
         const data = await putData(`comment/${idComent}`, newData);
 
-        
+
         return data
 
 
@@ -321,7 +333,7 @@ export async function loadgallery(email) {
             document.getElementById('main-container').innerHTML = "";
             document.getElementById('follows-container').innerHTML = "";
 
-            
+
 
             const galleryContainer = document.createElement('div');
             galleryContainer.classList.add('gallery');
@@ -398,6 +410,7 @@ export async function loadMyPost(email) {
 
 
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -413,6 +426,7 @@ export async function loadLikePost(email) {
     try {
         const data = await fetchData(`post/liked/${email}`);
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('follows-container').innerHTML = "";
             document.getElementById('main-container').innerHTML = "";
             data.forEach((post, index) => renderPost(post, index));
@@ -428,6 +442,7 @@ export async function loadPosts() {
     try {
         const data = await fetchData(`post`);
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -436,6 +451,7 @@ export async function loadPosts() {
     }
 }
 
+
 // Cargar los post de un usuarios seguidos
 export async function followedPost(email) {
     try {
@@ -443,6 +459,7 @@ export async function followedPost(email) {
 
 
         if (data) {
+            data.sort((a, b) => new Date(b.showPostDTO.creationDate) - new Date(a.showPostDTO.creationDate));
             document.getElementById('main-container').innerHTML = '';
             data.forEach((post, index) => renderPost(post, index));
         }
@@ -538,14 +555,14 @@ export function renderComments(comments, container) {
 
 function openEditCommentModal(idComment, content) {
     document.getElementById("commentModal").style.display = "block";
-    document.getElementById("comment").value = content; 
-    document.getElementById("commentForm").dataset.idComment = idComment; 
+    document.getElementById("comment").value = content;
+    document.getElementById("commentForm").dataset.idComment = idComment;
 }
 
 document.getElementById("closeModal").addEventListener("click", () => {
     document.getElementById("commentModal").style.display = "none";
     document.getElementById("commentForm").reset();
-    delete document.getElementById("commentForm").dataset.idComment; 
+    delete document.getElementById("commentForm").dataset.idComment;
 });
 
 
@@ -762,7 +779,7 @@ export async function loadTags() {
         const data = await fetchData('tag/tagDTO');
         if (data && data.length) {
             const sortedTags = data.sort((a, b) => b.count - a.count);
-            sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
+            sortedTags.slice(0, 5).forEach(tag => renderTags(tag));
         }
     } catch (error) {
         console.error('Error al cargar los tags:', error);
@@ -778,14 +795,16 @@ export async function renderUsers(user) {
     clone.querySelector('#username').textContent = `@${user.userName}`;
     clone.querySelector('#name').textContent = user.name;
     clone.querySelector('#bio').textContent = user.biography;
-    
+
     const followButton = clone.querySelector('#follow');
 
+    // Si el usuario que se muestra es el actual, se oculta el botón
     if (currentUser && currentUser.userName === user.userName) {
         followButton.style.display = 'none';
     } else if (currentUser) {
         try {
-            const isFollowing = await CheckFollow(user.userName);
+            // Usamos la lista local para determinar si ya sigues a este usuario
+            const isFollowing = followingList.some(u => u.userName === user.userName);
             followButton.textContent = isFollowing ? "Unfollow" : "Follow";
         } catch (error) {
             console.error("Error al verificar seguimiento:", error);
@@ -798,12 +817,22 @@ export async function renderUsers(user) {
     followButton.addEventListener('click', async () => {
         followButton.disabled = true;
         try {
-            if (followButton.textContent === "Follow") {
+            // Volvemos a chequear usando la lista local
+            const isFollowing = followingList.some(u => u.userName === user.userName);
+            if (!isFollowing) {
+                // Realizamos la acción de follow
                 await followUser(user.email);
                 followButton.textContent = "Unfollow";
+                // Agregamos el usuario a la lista local si aún no está
+                if (!followingList.some(u => u.userName === user.userName)) {
+                    followingList.push(user);
+                }
             } else {
+                // Realizamos la acción de unfollow
                 await UnfollowUser(user.email);
                 followButton.textContent = "Follow";
+                // Eliminamos el usuario de la lista local
+                followingList = followingList.filter(u => u.userName !== user.userName);
             }
         } catch (error) {
             console.error("Error al cambiar el estado de seguimiento:", error);
@@ -841,7 +870,7 @@ async function handleFormSubmit(event) {
 
     try {
         if (commentId) {
-            await UpdateComment(commentId, content);  
+            await UpdateComment(commentId, content);
         } else {
             await CommentPost(postId, content);
         }
@@ -862,7 +891,7 @@ document.getElementById("commentForm").addEventListener("submit", handleFormSubm
 // Formulario de post
 async function handlePostSubmit(event) {
     event.preventDefault();
-    const postId = document.getElementById("postId").value; 
+    const postId = document.getElementById("postId").value;
     const description = document.getElementById("description").value.trim();
     const tagsInput = document.getElementById("tags").value.trim();
     const mainLink = document.getElementById("mainLink").value.trim();
@@ -925,8 +954,8 @@ async function loadPostData(post) {
 }
 
 export async function renderTags(data) {
-    
-    
+
+
     const template = document.getElementById('tags-template');
     const clone = template.content.cloneNode(true);
 
@@ -964,7 +993,7 @@ export async function loadDataUserForm() {
     try {
         const user = JSON.parse(localStorage.getItem('user'))
         if (user) {
-            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
+            document.getElementById("profile-pic-url").value = user.photo || '';
             document.getElementById("name").value = user.name || '';
             document.getElementById("biography").value = user.biography || '';
         }
@@ -981,7 +1010,7 @@ function toggleVisibility(element, show) {
         } else {
             element.classList.add('hidden');
         }
-    } 
+    }
 }
 
 
@@ -997,294 +1026,365 @@ const searchContainer = document.getElementById('search-container');
 const mainContainer = document.getElementById('main-container');
 
 
+let followingList = [];
 
+console.log(followingList)
 
+async function updateFollowingList() {
+    try {
+        const data = await fetchData(`follow/following/${currentUser.userName}`);
+        followingList = data.reduce((acc, user) => {
+            if (!acc.find(u => u.userName === user.userName)) {
+                acc.push(user);
+            }
+            return acc;
+        }, []);
+    } catch (error) {
+        console.error("Error al actualizar la lista de following:", error);
+    }
+}
+
+// Función para actualizar la información del perfil en la interfaz.
 const updateUserProfile = (user) => {
+
+    const photo = document.getElementById('profile-pic-url').src = user.data;
     const nameEl = document.getElementById('name');
     const userNameEl = document.getElementById('userName');
     const biographyEl = document.getElementById('biography');
     const photoEl = document.getElementById('photo');
     const buttonContainer = document.querySelector('.button-settings');
-  
+
     if (!nameEl || !userNameEl || !biographyEl || !photoEl || !buttonContainer) {
-      console.error('Uno o más elementos del perfil no se encontraron en el DOM.');
-      return;
+        console.error('Uno o más elementos del perfil no se encontraron en el DOM.');
+        return;
     }
-  
+
     nameEl.textContent = user.name;
     userNameEl.textContent = `@${user.userName}`;
     biographyEl.textContent = user.biography;
     photoEl.src = user.photo;
-  
-    buttonContainer.innerHTML = '';
-  
-    if (user.userName === currentUser.userName) {
-      const editButton = document.createElement('button');
-      editButton.textContent = "Editar";
-      editButton.id = 'openprofilemodal';
-      editButton.classList.add('edit-button');
-      editButton.addEventListener('click', () => {
-        document.getElementById('ModalEdit').style.display = 'block';
-      });
-      buttonContainer.appendChild(editButton);
-    } else {
-      const followButton = document.createElement('button');
-      followButton.classList.add('follow-button');
-  
-      CheckFollow(user.userName)
-        .then(isFollowing => {
-          followButton.textContent = isFollowing ? "Unfollow" : "Follow";
-        })
-        .catch(error => {
-          console.error("Error al verificar seguimiento:", error);
-          followButton.textContent = "Follow";
-        });
-  
-      followButton.addEventListener('click', async () => {
-        try {
-          if (followButton.textContent === "Follow") {
-            await followUser(user.email);
-            followButton.textContent = "Unfollow";
-          } else {
-            // Dejar de seguir al usuario
-            await UnfollowUser(user.email);
-            followButton.textContent = "Follow";
-          }
-        } catch (error) {
-          console.error("Error al cambiar el estado de seguimiento:", error);
-        }
-      });
-  
-      buttonContainer.appendChild(followButton);
-    }
-  };
-  
-  
-  const updateStats = async (user) => {
-    try {
-      const [posts, followers, following] = await Promise.all([
-        fetchData(`post/user/${user.email}`),
-        fetchData(`follow/followers/${user.userName}`),
-        fetchData(`follow/following/${user.userName}`)
-      ]);
-  
-      const postsEl = document.getElementById('mypost');
-      const followersEl = document.getElementById('myfollowed');
-      const followingEl = document.getElementById('myfollowers');
-  
-      if (!postsEl || !followersEl || !followingEl) {
-        console.error('Uno o más elementos de estadísticas no se encontraron.');
-        return;
-      }
-  
-      postsEl.textContent = posts.length;
-      followersEl.textContent = followers.length;
-      followingEl.textContent = following.length;
-    } catch (error) {
-      console.error('Error al obtener las estadísticas:', error);
-      showError('Error al obtener los datos.');
-    }
-  };
-  
-  const showError = (message) => {
-    console.error(message);
-  };
-  
 
-  const setupButtons = (userName, email) => {
+    // Limpiamos el contenedor de botones
+    buttonContainer.innerHTML = '';
+
+    if (user.userName === currentUser.userName) {
+        const editButton = document.createElement('button');
+        editButton.textContent = "Editar";
+        editButton.id = 'openprofilemodal';
+        editButton.classList.add('edit-button');
+        editButton.addEventListener('click', () => {
+            document.getElementById('ModalEdit').style.display = 'block';
+        });
+        buttonContainer.appendChild(editButton);
+    } else {
+        const followButton = document.createElement('button');
+        followButton.classList.add('follow-button');
+
+        const isFollowing = followingList.some(u => u.userName === user.userName);
+        followButton.textContent = isFollowing ? "Unfollow" : "Follow";
+
+        followButton.addEventListener('click', async () => {
+            try {
+                const isFollowing = followingList.some(u => u.userName === user.userName);
+                if (!isFollowing) {
+                    await followUser(user.email);
+                    followButton.textContent = "Unfollow";
+                    if (!followingList.some(u => u.userName === user.userName)) {
+                        followingList.push(user);
+                    }
+                } else {
+                    await UnfollowUser(user.email);
+                    followButton.textContent = "Follow";
+                    followingList = followingList.filter(u => u.userName !== user.userName);
+                }
+            } catch (error) {
+                console.error("Error al cambiar el estado de seguimiento:", error);
+            }
+        });
+
+        buttonContainer.appendChild(followButton);
+    }
+};
+
+
+const updateStats = async (user) => {
+    try {
+        const [posts, followers, following] = await Promise.all([
+            fetchData(`post/user/${user.email}`),
+            fetchData(`follow/followers/${user.userName}`),
+            fetchData(`follow/following/${user.userName}`)
+        ]);
+
+        const postsEl = document.getElementById('mypost');
+        const followersEl = document.getElementById('myfollowed');
+        const followingEl = document.getElementById('myfollowers');
+
+        if (!postsEl || !followersEl || !followingEl) {
+            console.error('Uno o más elementos de estadísticas no se encontraron.');
+            return;
+        }
+
+        postsEl.textContent = posts.length;
+        followersEl.textContent = followers.length;
+        followingEl.textContent = following.length;
+    } catch (error) {
+        console.error('Error al obtener las estadísticas:', error);
+        showError('Error al obtener los datos.');
+    }
+};
+
+const showError = (message) => {
+    console.error(message);
+};
+
+
+const setupButtons = (userName, email) => {
     const forYouButton = document.querySelector('.post-button');
     const likesButton = document.querySelector('.likes-button');
     const galleryButton = document.querySelector('.photo-button');
     const followersButton = document.querySelector('#myfollowed');
-    const followingButton = document.querySelector('#myfollowers'); 
-  
+    const followingButton = document.querySelector('#myfollowers');
+
     if (forYouButton) {
-      forYouButton.onclick = () => {
+        forYouButton.onclick = () => {
+            loadMyPost(email);
+        };
         loadMyPost(email);
-      };
-      loadMyPost(email);
     }
     if (likesButton) {
-      likesButton.onclick = () => loadLikePost(email);
+        likesButton.onclick = () => loadLikePost(email);
     }
     if (followersButton) {
-      followersButton.onclick = () => loadFollowers(userName);
+        followersButton.onclick = () => loadFollowers(userName);
     }
     if (followingButton) {
-      followingButton.onclick = () => loadFollowing(userName);
+        followingButton.onclick = () => loadFollowing(userName);
     }
     if (galleryButton) {
-      galleryButton.onclick = () => loadgallery(email);
+        galleryButton.onclick = () => loadgallery(email);
     }
-  };
-  
-  export async function loadUserProfile(email) {
-    try {
-      const user = await fetchData(`users/${email}`);
-      if (user) {
-        updateUserProfile(user);
-        await updateStats(user);
-        setupButtons(user.userName, user.email);
-      } else {
-        showError('El usuario no se encontró.');
-      }
-    } catch (error) {
-      console.error('Detalle del error en loadUserProfile:', error);
-      showError('Error al cargar el perfil del usuario.');
-    }
-  }
-  
- 
-  document.addEventListener('DOMContentLoaded', () => {
+};
 
-     loadTags();
-    // --- Formularios y modales ---
+export async function loadUserProfile(email) {
+    try {
+        const user = await fetchData(`users/${email}`);
+        if (user) {
+            updateUserProfile(user);
+            await updateStats(user);
+            setupButtons(user.userName, user.email);
+        } else {
+            showError('El usuario no se encontró.');
+        }
+    } catch (error) {
+        console.error('Detalle del error en loadUserProfile:', error);
+        showError('Error al cargar el perfil del usuario.');
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    loadTags();
+    loadDataUserForm()
     const form = document.getElementById("myForm");
     if (form) {
-      form.addEventListener("submit", handlePostSubmit);
+        form.addEventListener("submit", handlePostSubmit);
     } else {
-      console.error("Error: No se encontró el formulario.");
+        console.error("Error: No se encontró el formulario.");
     }
-  
+
     const modal = document.getElementById("myModal");
     const modaledit = document.getElementById("ModalEdit");
     const openModal = document.getElementById("openModal");
     const openModaledit = document.getElementById("openprofilemodal");
-  
+
     if (openModal) {
-      openModal.addEventListener('click', () => {
-        modal.style.display = "block";
-      });
+        openModal.addEventListener('click', () => {
+            modal.style.display = "block";
+        });
     } else {
-      console.error("Error: No se encontró el botón de abrir modal.");
+        console.error("Error: No se encontró el botón de abrir modal.");
     }
-  
+
     if (openModaledit) {
-      openModaledit.addEventListener('click', () => {
-        modaledit.style.display = "block";
-      });
-    } 
-  
+        openModaledit.addEventListener('click', () => {
+            modaledit.style.display = "block";
+        });
+    }
+
     const span = document.getElementsByClassName("close")[0];
     const spanedit = document.getElementsByClassName("closeedit")[0];
-  
+
     if (span) {
-      span.addEventListener('click', () => {
-        modal.style.display = "none";
-      });
+        span.addEventListener('click', () => {
+            modal.style.display = "none";
+        });
     } else {
-      console.error("Error: No se encontró el elemento para cerrar el modal.");
+        console.error("Error: No se encontró el elemento para cerrar el modal.");
     }
-  
+
     if (spanedit) {
-      spanedit.addEventListener('click', () => {
-        modaledit.style.display = "none";
-      });
+        spanedit.addEventListener('click', () => {
+            modaledit.style.display = "none";
+        });
     } else {
-      console.error("Error: No se encontró el elemento para cerrar el modal edit.");
+        console.error("Error: No se encontró el elemento para cerrar el modal edit.");
     }
-  
+
     window.addEventListener('click', (event) => {
-      if (event.target == modal) {
-        modal.style.display = "none";
-        modaledit.style.display = "none";
-      }
+        if (event.target == modal) {
+            modal.style.display = "none";
+            modaledit.style.display = "none";
+        }
     });
-  
+
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      let email = urlParams.get('email');
-      const localUser = JSON.parse(localStorage.getItem('user'));
-      if (!email && localUser) {
-        email = localUser.email;
-      }
-      if (email) {
-        loadUserProfile(email);
-      } else {
-        showError('No se encontró el usuario local o el email proporcionado.');
-      }
+        const urlParams = new URLSearchParams(window.location.search);
+        let email = urlParams.get('email');
+        const localUser = JSON.parse(localStorage.getItem('user'));
+        if (!email && localUser) {
+            email = localUser.email;
+        }
+        if (email) {
+            loadUserProfile(email);
+        } else {
+            showError('No se encontró el usuario local o el email proporcionado.');
+        }
     } catch (error) {
-      console.error("Error al cargar el perfil:", error);
+        console.error("Error al cargar el perfil:", error);
     }
-  
+
     window.handleUserClick = async function (user) {
-      try {
-        toggleVisibility(profileContainer, true);
-        toggleVisibility(feedContainer, false);
-        toggleVisibility(notificationsContainer, false);
-        toggleVisibility(searchContainer, false);
-        toggleVisibility(mainContainer, true);
-        toggleVisibility(homeLink, true);
-        toggleVisibility(profileLink, true);
-        window.scrollTo(0, 0);
-  
-        await loadUserProfile(user.email);
-      } catch (error) {
-        console.error("Error al manejar el clic del usuario:", error);
-      }
+        try {
+            toggleVisibility(profileContainer, true);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, false);
+            toggleVisibility(searchContainer, false);
+            toggleVisibility(mainContainer, true);
+            toggleVisibility(homeLink, true);
+            toggleVisibility(profileLink, true);
+            window.scrollTo(0, 0);
+
+            await loadUserProfile(user.email);
+        } catch (error) {
+            console.error("Error al manejar el clic del usuario:", error);
+        }
     };
-  
+
     const localUser = JSON.parse(localStorage.getItem('user'));
     if (localUser && localUser.email) {
-      loadUserProfile(localUser.email);
+        loadUserProfile(localUser.email);
     } else {
-      console.error("No se encontró el usuario local o su email.");
+        console.error("No se encontró el usuario local o su email.");
     }
-  
+
     // --- Renderizar notificaciones ---
     renderNotificsation();
-  
+
     // --- Configuración de visibilidad de secciones ---
     window.addEventListener('load', () => {
-      toggleVisibility(profileContainer, false);
-      toggleVisibility(feedContainer, true);
-      toggleVisibility(notificationsContainer, false);
-      toggleVisibility(searchContainer, false)
-    });
-  
-    if (homeLink) {
-      homeLink.addEventListener('click', () => {
         toggleVisibility(profileContainer, false);
         toggleVisibility(feedContainer, true);
-        toggleVisibility(mainContainer, true);
         toggleVisibility(notificationsContainer, false);
         toggleVisibility(searchContainer, false)
-        loadPosts();
-      });
+    });
+
+    if (homeLink) {
+        homeLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, true);
+            toggleVisibility(mainContainer, true);
+            toggleVisibility(notificationsContainer, false);
+            toggleVisibility(searchContainer, false)
+            loadPosts();
+        });
     }
-  
+
     if (profileLink) {
-      profileLink.addEventListener('click', () => {
-        toggleVisibility(profileContainer, true);
-        toggleVisibility(feedContainer, false);
-        toggleVisibility(notificationsContainer, false);
-        toggleVisibility(mainContainer, true);
-        toggleVisibility(searchContainer, false);
-        const localUser = JSON.parse(localStorage.getItem('user'));
-        if (localUser && localUser.email) {
-          loadUserProfile(localUser.email);
-        }
-      });
+        profileLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, true);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, false);
+            toggleVisibility(mainContainer, true);
+            toggleVisibility(searchContainer, false);
+            const localUser = JSON.parse(localStorage.getItem('user'));
+            if (localUser && localUser.email) {
+                loadUserProfile(localUser.email);
+            }
+        });
     }
-  
+
     if (notificationsLink) {
-      notificationsLink.addEventListener('click', () => {
-        toggleVisibility(profileContainer, false);
-        toggleVisibility(feedContainer, false);
-        toggleVisibility(notificationsContainer, true);
-        toggleVisibility(mainContainer, false);
-        toggleVisibility(searchContainer, false);
-      });
+        notificationsLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, true);
+            toggleVisibility(mainContainer, false);
+            toggleVisibility(searchContainer, false);
+        });
     }
-  
+
     if (searchLink) {
-      searchLink.addEventListener('click', () => {
-        toggleVisibility(profileContainer, false);
-        toggleVisibility(feedContainer, false);
-        toggleVisibility(notificationsContainer, false);
-        toggleVisibility(searchContainer, true);
-        toggleVisibility(mainContainer, false);
-      });
+        searchLink.addEventListener('click', () => {
+            toggleVisibility(profileContainer, false);
+            toggleVisibility(feedContainer, false);
+            toggleVisibility(notificationsContainer, false);
+            toggleVisibility(searchContainer, true);
+            toggleVisibility(mainContainer, false);
+        });
     }
-  });
-  
+});
+
+
+document.getElementById('updateProfileForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Evita que la página se recargue
+
+    // Capturar los valores del formulario
+    const newPhoto = document.getElementById('profile-pic-url').value.trim();
+    const newName = document.getElementById('profilename').value.trim();
+    const newBiography = document.getElementById('profilebiography').value.trim();
+
+    // Validar que los campos requeridos no estén vacíos
+    if (!newName || !newBiography) {
+        console.warn("Por favor, completa los campos obligatorios.");
+        return;
+    }
+
+    // Crear el objeto con los nuevos datos
+    const newData = {
+        name: newName,
+        biography: newBiography,
+        photo: newPhoto || currentUser.photo // Si no se ingresa una nueva foto, mantiene la actual
+    };
+
+    try {
+        // Llamar a la función updateUser
+        const response = await updateUser(newData);
+
+        if (response && response.ok) {
+            const updatedUser = await response.json();
+
+            // Actualizar la interfaz con la nueva información
+            updateUserProfile(updatedUser);
+
+            // Actualizar el usuario en localStorage
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+
+            // Cerrar el modal después de actualizar
+            document.getElementById('ModalEdit').style.display = 'none';
+        } else {
+            console.error('Error al actualizar el perfil');
+        }
+    } catch (error) {
+        console.error('Error en la actualización del usuario:', error);
+    }
+});
+
+
+document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById('ModalEdit').style.display = 'none';
+
+    // Limpiar los campos del formulario
+    document.getElementById('updateProfileForm').reset();
+});
