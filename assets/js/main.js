@@ -17,6 +17,25 @@ if (logoutButton) {
 // ENDPOINTS
 
 
+//SEARCH
+
+// Buscar data
+export async function search(Data) {
+    try {
+
+        const response = await fetchData(`search/${Data}`);
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los posts de For You');
+        }
+        return response
+    } catch (error) {
+        console.error('Error fetching For You posts:', error);
+    }
+
+}
+
+
 // USERS
 
 //Actualizar usuario
@@ -25,7 +44,7 @@ export async function updateUser(newData) {
 
         const response = await putData(`users/update/${currentUser.email}`, newData);
 
-        if (response.ok) {
+        if (!response.ok) {
             throw new Error('Error al obtener los posts de For You');
         }
         return response
@@ -43,9 +62,9 @@ export async function updateUser(newData) {
 export async function followUser(email) {
     try {
 
-        const response = await postData(`follow/ad/${currentUser.email}/${email}`);
+        const response = await postData(`follow/add/${email}/${currentUser.email}`);
 
-        if (response.ok) {
+        if (!response.ok) {
             throw new Error('Error al obtener los posts de For You');
         }
         return response
@@ -60,9 +79,9 @@ export async function UnfollowUser(email) {
     try {
         const currentUser = JSON.parse(localStorage.getItem('user'))
 
-        const response = await deleteData(`follow/ad/${currentUser.email}/${email}`);
+        const response = await deleteData(`follow/unfollow/${email}/${currentUser.email}`);
 
-        if (response.ok) {
+        if (!response.ok) {
             throw new Error('Error al obtener los posts de For You');
         }
         return response
@@ -75,16 +94,20 @@ export async function UnfollowUser(email) {
 // Verificar si se siguen los usuarios
 export async function CheckFollow(userName) {
     try {
-        const followers = await fetchData(`follow/followers/${userName}`);
-        const following = await fetchData(`follow/following/${userName}`);
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            console.error('No se encontró información del usuario en localStorage.');
+            return false;
+        }
 
-        const currentUser = localStorage.getItem('user').userName;
-        const isFollowing = following.some(user => user.userName === currentUser);
-        const isFollowedBy = followers.some(user => user.userName === currentUser);
+        const localUserName = JSON.parse(userData).userName;
+        console.log('Usuario local:', localUserName);
 
-        return isFollowing && isFollowedBy;
+        const following = await fetchData(`follow/following/${localUserName}`);
+
+        return following.some(user => user.userName === userName);
     } catch (error) {
-        console.error('Error al verificar la relación de seguimiento:', error);
+        console.error('Error al verificar el seguimiento:', error);
         return false;
     }
 }
@@ -145,7 +168,7 @@ async function loadForYouNotificationsByUsername() {
 
         const response = await fetchData(`notifications/${currentUser.userName}`);
 
-        if (response.ok) {
+        if (!response.ok) {
             throw new Error('Error al obtener los posts de For You');
         }
         return response
@@ -329,6 +352,7 @@ async function createPost(createPostDTO) {
     try {
         const email = currentUser.email;
         const response = await postData(`post/${email}`, createPostDTO)
+
         if (!response.ok) {
             throw new Error('Creation post is not okay');
         }
@@ -591,8 +615,8 @@ async function loadNotificationfollow(element) {
     const template = document.getElementById('Noti-follow-template');
     const clone = template.content.cloneNode(true);
     clone.querySelector('#profile-img').src = element.userPhoto;
-    clone.querySelector('#name').textContent = `${element.name} has followed you`;
-    clone.querySelector('#handle').textContent = `@${element.username}`;
+    clone.querySelector('#template2-name').textContent = `${element.name} has followed you`;
+    clone.querySelector('#template2-handle').textContent = `@${element.username}`;
 
     const checkButton = clone.querySelector('#checkButon');
     checkButton.addEventListener('click', async () => {
@@ -746,28 +770,47 @@ export async function loadTags() {
 }
 
 // Cargar los usuarios
-export function renderUsers(user) {
+export async function renderUsers(user) {
     const template = document.getElementById('UserTemplate');
-
     const clone = template.content.cloneNode(true);
 
     clone.querySelector('#photo').src = user.photo;
     clone.querySelector('#username').textContent = `@${user.userName}`;
     clone.querySelector('#name').textContent = user.name;
     clone.querySelector('#bio').textContent = user.biography;
+    
     const followButton = clone.querySelector('#follow');
 
-    if (currentUser) {
-        const result = CheckFollow(user.userName);
-
-        if (result.isFollowing) {
-            followButton.textContent = "Unfollow";
-        } else if (result.isFollowedBy) {
-            followButton.textContent = "Follow";
-        } else {
+    if (currentUser && currentUser.userName === user.userName) {
+        followButton.style.display = 'none';
+    } else if (currentUser) {
+        try {
+            const isFollowing = await CheckFollow(user.userName);
+            followButton.textContent = isFollowing ? "Unfollow" : "Follow";
+        } catch (error) {
+            console.error("Error al verificar seguimiento:", error);
             followButton.textContent = "Follow";
         }
+    } else {
+        followButton.style.display = 'none';
     }
+
+    followButton.addEventListener('click', async () => {
+        followButton.disabled = true;
+        try {
+            if (followButton.textContent === "Follow") {
+                await followUser(user.email);
+                followButton.textContent = "Unfollow";
+            } else {
+                await UnfollowUser(user.email);
+                followButton.textContent = "Follow";
+            }
+        } catch (error) {
+            console.error("Error al cambiar el estado de seguimiento:", error);
+        } finally {
+            followButton.disabled = false;
+        }
+    });
 
     clone.querySelector('#name').addEventListener('click', () => {
         handleUserClick(user);
@@ -775,6 +818,7 @@ export function renderUsers(user) {
 
     document.getElementById('main-container').appendChild(clone);
 }
+
 
 
 
@@ -956,7 +1000,6 @@ const mainContainer = document.getElementById('main-container');
 
 
 const updateUserProfile = (user) => {
-    // Busca los elementos del perfil en el DOM y verifica que existan
     const nameEl = document.getElementById('name');
     const userNameEl = document.getElementById('userName');
     const biographyEl = document.getElementById('biography');
@@ -974,6 +1017,7 @@ const updateUserProfile = (user) => {
     photoEl.src = user.photo;
   
     buttonContainer.innerHTML = '';
+  
     if (user.userName === currentUser.userName) {
       const editButton = document.createElement('button');
       editButton.textContent = "Editar";
@@ -985,15 +1029,36 @@ const updateUserProfile = (user) => {
       buttonContainer.appendChild(editButton);
     } else {
       const followButton = document.createElement('button');
-      followButton.textContent = "Seguir";
       followButton.classList.add('follow-button');
-      followButton.addEventListener('click', () => {
-        console.log('Seguir a usuario:', user);
-        // Aquí puedes llamar a followUser(user.email);
+  
+      CheckFollow(user.userName)
+        .then(isFollowing => {
+          followButton.textContent = isFollowing ? "Unfollow" : "Follow";
+        })
+        .catch(error => {
+          console.error("Error al verificar seguimiento:", error);
+          followButton.textContent = "Follow";
+        });
+  
+      followButton.addEventListener('click', async () => {
+        try {
+          if (followButton.textContent === "Follow") {
+            await followUser(user.email);
+            followButton.textContent = "Unfollow";
+          } else {
+            // Dejar de seguir al usuario
+            await UnfollowUser(user.email);
+            followButton.textContent = "Follow";
+          }
+        } catch (error) {
+          console.error("Error al cambiar el estado de seguimiento:", error);
+        }
       });
+  
       buttonContainer.appendChild(followButton);
     }
   };
+  
   
   const updateStats = async (user) => {
     try {
@@ -1003,10 +1068,9 @@ const updateUserProfile = (user) => {
         fetchData(`follow/following/${user.userName}`)
       ]);
   
-      // Busca los elementos donde se mostrarán las estadísticas
       const postsEl = document.getElementById('mypost');
-      const followersEl = document.getElementById('myfollowers');
-      const followingEl = document.getElementById('myfollowed');
+      const followersEl = document.getElementById('myfollowed');
+      const followingEl = document.getElementById('myfollowers');
   
       if (!postsEl || !followersEl || !followingEl) {
         console.error('Uno o más elementos de estadísticas no se encontraron.');
@@ -1031,8 +1095,8 @@ const updateUserProfile = (user) => {
     const forYouButton = document.querySelector('.post-button');
     const likesButton = document.querySelector('.likes-button');
     const galleryButton = document.querySelector('.photo-button');
-    const followersButton = document.querySelector('#myfollowers');
-    const followingButton = document.querySelector('#myfollowed');
+    const followersButton = document.querySelector('#myfollowed');
+    const followingButton = document.querySelector('#myfollowers'); 
   
     if (forYouButton) {
       forYouButton.onclick = () => {
@@ -1099,9 +1163,7 @@ const updateUserProfile = (user) => {
       openModaledit.addEventListener('click', () => {
         modaledit.style.display = "block";
       });
-    } else {
-      console.error("Error: No se encontró el botón de abrir modal edit.");
-    }
+    } 
   
     const span = document.getElementsByClassName("close")[0];
     const spanedit = document.getElementsByClassName("closeedit")[0];
@@ -1156,14 +1218,12 @@ const updateUserProfile = (user) => {
         toggleVisibility(profileLink, true);
         window.scrollTo(0, 0);
   
-        // Carga el perfil del usuario clickeado
         await loadUserProfile(user.email);
       } catch (error) {
         console.error("Error al manejar el clic del usuario:", error);
       }
     };
   
-    // --- Cargar perfil del usuario logueado ---
     const localUser = JSON.parse(localStorage.getItem('user'));
     if (localUser && localUser.email) {
       loadUserProfile(localUser.email);
@@ -1179,15 +1239,16 @@ const updateUserProfile = (user) => {
       toggleVisibility(profileContainer, false);
       toggleVisibility(feedContainer, true);
       toggleVisibility(notificationsContainer, false);
+      toggleVisibility(searchContainer, false)
     });
   
-    // --- Configuración de botones de navegación ---
     if (homeLink) {
       homeLink.addEventListener('click', () => {
         toggleVisibility(profileContainer, false);
         toggleVisibility(feedContainer, true);
         toggleVisibility(mainContainer, true);
         toggleVisibility(notificationsContainer, false);
+        toggleVisibility(searchContainer, false)
         loadPosts();
       });
     }
@@ -1198,6 +1259,7 @@ const updateUserProfile = (user) => {
         toggleVisibility(feedContainer, false);
         toggleVisibility(notificationsContainer, false);
         toggleVisibility(mainContainer, true);
+        toggleVisibility(searchContainer, false);
         const localUser = JSON.parse(localStorage.getItem('user'));
         if (localUser && localUser.email) {
           loadUserProfile(localUser.email);

@@ -16,6 +16,44 @@ main{
     min-height: 100vh;
 }
 
+#search-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #e6ecf0;
+    padding: 8px;
+    border-radius: 50px;
+    width: 100%;
+}
+
+.search-box input[type="search"] {
+    border: none;
+    background: none;
+    outline: none;
+    padding: 8px;
+    font-size: 16px;
+    flex-grow: 1;
+    border-radius: 50px;
+}
+
+.search-box ion-icon {
+    font-size: 20px;
+    color: #8899a6;
+    margin-left: 10px;
+}
+
+
 .likebutton{
     color: red !important;
 }

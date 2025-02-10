@@ -371,6 +371,21 @@
             <div id="not"></div>
         </div>
 
+        <div class="search-container" id="search-container">
+            <div class="header">
+                <div class="search-box">
+                    <label for="search-input"></label>
+                    <input type="search" id="search-input" placeholder="Search ...">
+                    <ion-icon name="search-outline"></ion-icon>
+                </div>
+            </div>
+            <div class="results" id="results">
+            </div>
+        </div>
+        
+
+
+
         <div class="search-container"></div>
 
 
@@ -468,26 +483,7 @@
                                     <input type="text" id="biography">
                                 </div>
                             </div>
-                            <div class="security">
-                                <button type="button" id="accordion-button" class="accordion-button"
-                                    onclick="toggleAccordion()">Seguridad</button>
-                                <div id="accordion-content" class="accordion-content">
-                                    <div class="input-group">
-                                        <label for="last-password">Contraseña Anterior:</label>
-                                        <input type="password" id="last-password">
-                                    </div>
-                                    <button type="button" class="update-button" onclick="validatePassword()">Validar
-                                        Contraseña</button>
-                                    <div class="input-group">
-                                        <label for="new-password" class="hidden">Nueva Contraseña:</label>
-                                        <input type="password" id="new-password" class="hidden">
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="repeat-password" class="hidden">Repetir Contraseña:</label>
-                                        <input type="password" id="repeat-password" class="hidden">
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <button class="update-button">Actualizar Perfil</button>
                         </form>
                     </div>
@@ -496,12 +492,12 @@
         </div>
     </div>
 
-    
+
     <div id="commentModal" class="modal">
         <div class="modal-content">
             <span id="closeModal" class="close">&times;</span>
             <form id="commentForm">
-                <textarea id="comment"  class="comment-text" name="comment" rows="4" cols="50"></textarea><br><br>
+                <textarea id="comment" class="comment-text" name="comment" rows="4" cols="50"></textarea><br><br>
                 <input type="submit" value="Enviar Comentario">
             </form>
         </div>
