@@ -4,7 +4,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const userName = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    const url = `http://localhost:8080/login?userName=${encodeURIComponent(userName)}&password=${encodeURIComponent(password)}`;
+    const url = `http://localhost:8080/demo-0.0.1-SNAPSHOT/login?userName=${encodeURIComponent(userName)}&password=${encodeURIComponent(password)}`;
 
     try {
         const response = await fetch(url, {
@@ -22,7 +22,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         const token = data.token; 
         localStorage.setItem('token', token); 
 
-        const userResponse = await fetch('http://localhost:8080/api/users', {
+        const userResponse = await fetch('http://localhost:8080/demo-0.0.1-SNAPSHOT/api/users', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

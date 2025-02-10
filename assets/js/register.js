@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function fetchUsers() {
-        const response = await fetch('http://localhost:8080/api/users');
+        const response = await fetch('http://localhost:8080/demo-0.0.1-SNAPSHOT/api/users');
         const data = await response.json();
         return data;
     }
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/register', {
+            const response = await fetch('http://localhost:8080/demo-0.0.1-SNAPSHOT/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

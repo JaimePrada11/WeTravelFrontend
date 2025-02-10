@@ -1,4 +1,4 @@
-const URL = 'http://localhost:8080/api/'
+const URL = 'http://localhost:8080/demo-0.0.1-SNAPSHOT/api/'
 
 export async function fetchData(endpoint) {
     try {
