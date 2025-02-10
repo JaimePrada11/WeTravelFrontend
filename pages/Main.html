@@ -309,6 +309,9 @@
                         <img src="https://randomuser.me/api/portraits/women/11.jpg" alt="Foto de Perfil"
                             class="profile-image" id="photo">
                     </div>
+                    <div class="button-settings">
+
+                    </div>
 
 
                     <div class="line"></div>
@@ -326,6 +329,8 @@
                             <p class="stat-label">Siguiendo</p>
                         </div>
                     </div>
+
+
                 </div>
             </div>
 
@@ -413,16 +418,13 @@
                             required></textarea>
 
                         <label for="tags">Tags:</label>
-                        <input type="text" id="tags" name="tags" placeholder="Ejemplo: #Viajes1#Bogota" >
+                        <input type="text" id="tags" name="tags" placeholder="Ejemplo: #Viajes1#Bogota">
 
                         <label for="mainLink">Photo</label>
                         <input type="url" id="mainLink" placeholder="Photo 1" name="mainLink">
 
                         <label for="optionalLink1">Photo</label>
                         <input type="url" id="optionalLink1" placeholder="Photo 2" name="optionalLink1">
-
-                        <label for="optionalLink2">Photo</label>
-                        <input type="url" id="optionalLink2" placeholder="Photo 3" name="optionalLink2">
 
                         <button type="submit">Post</button>
                         <input type="hidden" id="postId" name="postId">
@@ -432,6 +434,68 @@
         </div>
     </div>
 
+
+    <div id="ModalEdit" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="closeedit">&times;</span>
+            <div id="modaledit">
+                <div class="form-container">
+                    <div class="settings-header">
+                        <h2 class="title-setting">Configuración</h2>
+                        <p class="text-settings">Configura los ajustes de tu cuenta</p>
+                    </div>
+                    <div class="settings-form">
+                        <form class="form">
+                            <div class="personal-info">
+                                <div class="profile-pic">
+                                    <img id="current-profile-pic"
+                                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s"
+                                        alt="Foto de Perfil">
+                                    <button type="button" class="remove-pic" onclick="toggleInput()">x</button>
+                                </div>
+                                <div class="input-group">
+                                    <label for="profile-pic-url" class="hidden">URL de la nueva foto de perfil:</label>
+                                    <input type="text" id="profile-pic-url" class="hidden"
+                                        placeholder="Introduce la URL de tu nueva foto de perfil"
+                                        oninput="updateProfilePic()">
+                                </div>
+                                <h1>Datos Personales</h1>
+                                <div class="input-group">
+                                    <label for="name">Nombre:</label>
+                                    <input type="text" id="name">
+                                </div>
+                                <div class="input-group">
+                                    <label for="biography">biography:</label>
+                                    <input type="text" id="biography">
+                                </div>
+                            </div>
+                            <div class="security">
+                                <button type="button" id="accordion-button" class="accordion-button"
+                                    onclick="toggleAccordion()">Seguridad</button>
+                                <div id="accordion-content" class="accordion-content">
+                                    <div class="input-group">
+                                        <label for="last-password">Contraseña Anterior:</label>
+                                        <input type="password" id="last-password">
+                                    </div>
+                                    <button type="button" class="update-button" onclick="validatePassword()">Validar
+                                        Contraseña</button>
+                                    <div class="input-group">
+                                        <label for="new-password" class="hidden">Nueva Contraseña:</label>
+                                        <input type="password" id="new-password" class="hidden">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="repeat-password" class="hidden">Repetir Contraseña:</label>
+                                        <input type="password" id="repeat-password" class="hidden">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="update-button">Actualizar Perfil</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

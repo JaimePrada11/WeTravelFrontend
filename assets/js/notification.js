@@ -33,18 +33,19 @@ async function renderNotificsation() {
         if (element.tipo === 'Comment') {
             // console.log(element)
             loadNotificationComment(element)
-        } if (element.tipo ==='Like') {
-          
+        } if (element.tipo === 'Like') {
+
             loadNotificationLike(element);
 
 
-        } 
-        if(element.tipo === 'Follow'){
+        }
+        if (element.tipo === 'Follow') {
             loadNotificationfollow(element);
-       
+
             // console.log(element)
-        }})
-    };
+        }
+    })
+};
 
 
 
@@ -105,8 +106,8 @@ async function changeNotifcationstatus(id) {
         const response = await postData(`notifications/read/${id}`);
 
         // Imprimir la respuesta original para depurar
-      
-        
+
+
         if (!response.ok) {
             throw new Error('Error al marcar la notificación como leída');
         }
@@ -183,7 +184,7 @@ async function handleFormSubmit(event) {
     const optionalLink1 = document.getElementById("optionalLink1").value.trim();
     const optionalLink2 = document.getElementById("optionalLink2").value.trim();
 
- 
+
 
     if (!description || !tagsInput || !mainLink) {
         console.warn("Error: Faltan campos obligatorios.");
@@ -219,7 +220,7 @@ async function handleFormSubmit(event) {
     console.log("Datos enviados:", createPostDTO);
     PostPostfunction(createPostDTO);
 
- 
+
     return createPostDTO;
 }
 
@@ -249,14 +250,14 @@ async function PostPostfunction(createPostDTO) {
         console.error('Error Creating your post:', error);
     }
 
-    
+
 }
 
 async function PutPostfunction(postId, updatePostDTO) {
     try {
         const user = JSON.parse(localStorage.getItem('user'));
         const response = await putData(`post/${postId}`, updatePostDTO);
-        
+
         if (!response.ok) {
             throw new Error('Update post failed');
         }
@@ -266,6 +267,21 @@ async function PutPostfunction(postId, updatePostDTO) {
     }
 }
 
+async function loadpost() {
+
+    try {
+        const response = await fetchData(`post`);
+
+        if (!response.ok) {
+            throw new Error('Update post failed');
+        }
+        return response;
+
+
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
 
 
 async function loadPostData(postId) {
@@ -285,11 +301,11 @@ async function loadPostData(postId) {
         const photos = post?.photoDTOurl?.map(photo => photo.url) || [];
 
 
-                document.getElementById('mainLink').value = photos[0] || '';
+        document.getElementById('mainLink').value = photos[0] || '';
         document.getElementById('optionalLink1').value = photos[1] || '';
         document.getElementById('optionalLink2').value = photos[2] || '';
 
-        
+
     } catch (error) {
         console.error('Error cargando post:', error);
     }

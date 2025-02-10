@@ -1,7 +1,10 @@
 import { loadUserProfile } from './Profile.js';
 import { timeAgo, fetchData, postData, deleteData, putData, patchData } from './utils.js';
 
+const currentUser = JSON.parse(localStorage.getItem('user'))
 
+
+//Funcion para limpirar el localStorage
 function clearLocalStorage() {
     localStorage.clear();
     console.log("El localStorage ha sido borrado.");
@@ -14,59 +17,34 @@ if (logoutButton) {
     });
 }
 
+// ENDPOINTS
 
 
-async function createPost(createPostDTO) {
+// USERS
 
+//Actualizar usuario
+export async function updateUser(newData) {
     try {
 
-        const user = JSON.parse(localStorage.getItem('user'));
-        const email = user.email;
+        const response = await putData(`users/update/${currentUser.email}`, newData);
 
-        const response = await postData(`post/${email}`, createPostDTO)
-
-        if (!response.ok) {
-            throw new Error('Creation post is not okay');
+        if (response.ok) {
+            throw new Error('Error al obtener los posts de For You');
         }
-
-
         return response
     } catch (error) {
-        console.error('Error Creating your post:', error);
+        console.error('Error fetching For You posts:', error);
     }
-
 
 }
 
-async function updatePost(postId, updatePostDTO) {
-    try {
-        const response = await putData(`post/${postId}`, updatePostDTO);
 
-        if (!response.ok) {
-            throw new Error('Update post failed');
-        }
-        return response;
-    } catch (error) {
-        console.error('Error updating post:', error);
-    }
-}
 
-async function deletePost(postId) {
-    try {
-        const response = await deleteData(`post/${postId}`);
+//FOLLOW
 
-        if (!response.ok) {
-            throw new Error('Update post failed');
-        }
-        return response;
-    } catch (error) {
-        console.error('Error updating post:', error);
-    }
-}
-
+// Seguir a un usuario
 export async function followUser(email) {
     try {
-        const currentUser = JSON.parse(localStorage.getItem('user'))
 
         const response = await postData(`follow/ad/${currentUser.email}/${email}`);
 
@@ -80,6 +58,7 @@ export async function followUser(email) {
 
 }
 
+// Dejar de seguir a un usuario
 export async function UnfollowUser(email) {
     try {
         const currentUser = JSON.parse(localStorage.getItem('user'))
@@ -96,25 +75,92 @@ export async function UnfollowUser(email) {
 
 }
 
-export async function loadDataUserForm() {
+// Verificar si se siguen los usuarios
+export async function CheckFollow(userName) {
     try {
-        const user = JSON.parse(localStorage.getItem('user'))
-        if (user) {
-            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
-            document.getElementById("name").value = user.name || '';
-            document.getElementById("biography").value = user.biography || '';
-        }
+        const followers = await fetchData(`follow/followers/${userName}`);
+        const following = await fetchData(`follow/following/${userName}`);
+
+        const currentUser = localStorage.getItem('user').userName;
+        const isFollowing = following.some(user => user.userName === currentUser);
+        const isFollowedBy = followers.some(user => user.userName === currentUser);
+
+        return isFollowing && isFollowedBy;
     } catch (error) {
-        console.log(error)
+        console.error('Error al verificar la relación de seguimiento:', error);
+        return false;
     }
 }
 
 
+// Cargar los seguidores de un usuario
+export async function loadFollowers(userName) {
+    try {
+        const data = await fetchData(`follow/followers/${userName}`);
+
+        if (data) {
+            document.getElementById('follows-container').innerHTML = "";
+            document.getElementById('main-container').innerHTML = "";
+            data.forEach((user) => renderUsers(user));
+        }
+    } catch (error) {
+        console.error('Error al cargar los seguidores:', error);
+    }
+}
+
+// Cargar los seguidos de un usuario
+export async function loadFollowing(userName) {
+    try {
+        const data = await fetchData(`follow/following/${userName}`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = "";
+            document.getElementById('follows-container').innerHTML = "";
+            data.forEach((user) => renderUsers(user));
+        }
+    } catch (error) {
+        console.error('Error al cargar los seguidos:', error);
+    }
+}
+
+
+
+// TAGS
+
+// Obtener los post de un tag
+async function loadPostTags(tag) {
+
+    try {
+        const response = await fetchData(`post/tag/${tag}`);
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los tags');
+        }
+        return response;
+
+
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
+
+// Obtener tag mas usados
+export async function loadTags() {
+    const data = await fetchData('tag/tagDTO');
+    if (data) {
+        const sortedTags = data.sort((a, b) => b.count - a.count);
+        sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
+    }
+}
+
+
+
+//NOTIFICACIONES
+
+// Obtener las notificaciones por usuario
 async function loadForYouNotificationsByUsername() {
     try {
-        const user = JSON.parse(localStorage.getItem('user'))
 
-        const response = await fetchData(`notifications/${user.userName}`);
+        const response = await fetchData(`notifications/${currentUser.userName}`);
 
         if (response.ok) {
             throw new Error('Error al obtener los posts de For You');
@@ -125,76 +171,7 @@ async function loadForYouNotificationsByUsername() {
     }
 }
 
-async function renderNotificsation() {
-    const data = await loadForYouNotificationsByUsername();
-    console.log(data);
-
-    if (data) {
-        document.getElementById('main-container').innerHTML = "";
-        document.getElementById('follows-container').innerHTML = "";
-        document.getElementById('not').innerHTML = "";
-
-        const unreadNotifications = data.filter(element => !element.status);
-
-        unreadNotifications.forEach(element => {
-            if (element.tipo === 'Comment') {
-                loadNotificationComment(element);
-            } else if (element.tipo === 'Like') {
-                loadNotificationLike(element);
-            } else if (element.tipo === 'Follow') {
-                loadNotificationfollow(element);
-            }
-        });
-    }
-}
-
-
-
-async function loadNotificationComment(element) {
-    const template = document.getElementById('Noti-comment-template');
-    const clone = template.content.cloneNode(true);
-    clone.querySelector('#profile-img').src = element.userPhoto;
-    clone.querySelector('#name').textContent = `${element.name} has made you a comment`;
-    clone.querySelector('#handle').textContent = `@${element.username}`;
-
-    const checkButton = clone.querySelector('#checkButon');
-    checkButton.addEventListener('click', async () => {
-        await changeNotifcationstatus(element.idNotification);
-    });
-
-    document.getElementById('not').appendChild(clone);
-}
-
-async function loadNotificationLike(element) {
-    const template = document.getElementById('Noti-like-template');
-    const clone = template.content.cloneNode(true);
-    clone.querySelector('#profile-img').src = element.userPhoto;
-    clone.querySelector('#name').textContent = `${element.name} has made you a Like`;
-    clone.querySelector('#handle').textContent = `@${element.username}`;
-
-    const checkButton = clone.querySelector('#checkButon');
-    checkButton.addEventListener('click', async () => {
-        await changeNotifcationstatus(element.idNotification);
-    });
-
-    document.getElementById('not').appendChild(clone);
-}
-
-async function loadNotificationfollow(element) {
-    const template = document.getElementById('Noti-follow-template');
-    const clone = template.content.cloneNode(true);
-    clone.querySelector('#profile-img').src = element.userPhoto;
-    clone.querySelector('#name').textContent = `${element.name} has followed you`;
-    clone.querySelector('#handle').textContent = `@${element.username}`;
-
-    const checkButton = clone.querySelector('#checkButon');
-    checkButton.addEventListener('click', async () => {
-        await changeNotifcationstatus(element.idNotification);
-    });
-
-    document.getElementById('not').appendChild(clone);
-}
-
+// Cambiar las notificaciones a leidas
 async function changeNotifcationstatus(id) {
     try {
         const response = await postData(`notifications/read/${id}`);
@@ -216,26 +193,287 @@ async function changeNotifcationstatus(id) {
     }
 }
 
+
+
+// COMMENTS
+
+// Cargar un comentario
 export async function loadComment(idComent) {
     try {
         const data = await fetchData(`comment/findId/${idComent}`);
 
+        return data
 
     } catch (error) {
         console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
 
-export async function CommentPost(email, idPost, comment) {
+//Crear un comentario
+export async function CommentPost(idPost, comment) {
+
+    try {
+        const data = await postData(`comment/${currentUser.email}/${idPost}`, comment);
+
+        if (!data.ok) {
+            throw new Error('Error al crear comentario');
+        }
+        return data
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Actualizar Comentario
+export async function UpdateComment(idPost, newData) {
+    try {
+        const data = await patchData(`comment/${idPost}`, newData);
+
+        if (!data.ok) {
+            throw new Error('Error al actualizar comentario');
+        }
+        return data
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Eliminar Comentario
+export async function deleteComment(idComment) {
+    try {
+        const data = await deleteData(`comment/${idComment}`);
+        if (!data.ok) {
+            throw new Error('Error al eliminar comentario');
+        }
+        return data
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+
+//LIKES
+
+// Dar like a un post
+export async function likedPost( idPost) {
+    try {
+        const data = await postData(`like/likepost/${currentUser.email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Quitar el like a un post
+export async function unlikedPost(idLike) {
+    try {
+        const data = await deleteData(`like/${idLike}`);
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Dar like a un commentario
+export async function likedComment( idPost) {
+    try {
+        const data = await postData(`like/likecomment/${currentUser.email}/${idPost}`);
+
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Quitar el like a un commentario
+export async function unlikeComment(idLike) {
+    try {
+        const data = await deleteData(`like/${idLike}`);
+
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+// PHOTOS
+
+// Cargar las fotos de un usuario
+export async function loadgallery(email) {
+    try {
+        const data = await fetchData(`photo/user/${email}`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = "";
+            document.getElementById('follows-container').innerHTML = "";
+            console.log(data);
+
+
+            const galleryContainer = document.createElement('div');
+            galleryContainer.classList.add('gallery');
+
+            data.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = image.url;
+                imgElement.alt = 'Imagen de la galería';
+                imgElement.classList.add('gallery-img');
+
+                galleryContainer.appendChild(imgElement);
+            });
+
+            document.getElementById('main-container').appendChild(galleryContainer);
+        }
+    } catch (error) {
+        console.error('Error al cargar los seguidos:', error);
+    }
+}
+
+
+
+// POST
+
+// crear un post
+async function createPost(createPostDTO) {
+
+    try {
+        const email = currentUser.email;
+        const response = await postData(`post/${email}`, createPostDTO)
+        if (!response.ok) {
+            throw new Error('Creation post is not okay');
+        }
+
+        return response
+    } catch (error) {
+        console.error('Error Creating your post:', error);
+    }
+
+
+}
+
+// Actualizar un post
+async function updatePost(postId, updatePostDTO) {
+    try {
+        const response = await putData(`post/${postId}`, updatePostDTO);
+
+        if (!response.ok) {
+            throw new Error('Update post failed');
+        }
+        return response;
+    } catch (error) {
+        console.error('Error updating post:', error);
+    }
+}
+
+// Eliminar un post
+async function deletePost(postId) {
+    try {
+        const response = await deleteData(`post/${postId}`);
+
+        if (!response.ok) {
+            throw new Error('Update post failed');
+        }
+        return response;
+    } catch (error) {
+        console.error('Error updating post:', error);
+    }
+}
+
+// Cargar los post de un usuario
+export async function loadMyPost(email) {
     if (!email) return;
     try {
-        const data = await postData(`comment/${email}/${idPost}`, comment);
+        const data = await fetchData(`post/user/${email}`);
 
-
+        if (data) {
+            document.getElementById('main-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        }
     } catch (error) {
         console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
+
+// Cargar los post con likes de un usuario
+export async function loadLikePost(email) {
+    if (!email) return;
+
+    try {
+        const data = await fetchData(`post/liked/${email}`);
+        if (data) {
+            document.getElementById('follows-container').innerHTML = "";
+            document.getElementById('main-container').innerHTML = "";
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones que le gustaron al usuario:', error);
+    }
+}
+
+
+// Cargar todos los post activos para recomendados
+export async function loadPosts() {
+    try {
+        const data = await fetchData(`post`);
+        if (data) {
+            document.getElementById('main-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+// Cargar los post de un usuarios seguidos
+export async function followedPost(email) {
+    try {
+        const data = await fetchData(`post/my/${email}`);
+
+
+        if (data) {
+            document.getElementById('main-container').innerHTML = '';
+            data.forEach((post, index) => renderPost(post, index));
+        }
+    } catch (error) {
+        console.error('Error al cargar las publicaciones del usuario:', error);
+    }
+}
+
+
+
+
+
+
+
+async function loadPostData(post) {
+    try {
+
+        // Rellenar campos del formulario
+        document.getElementById('postId').value = post.showPostDTO.postid;
+        document.getElementById('description').value = post.showPostDTO.description;
+        const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
+        document.getElementById('tags').value = tags;
+
+        const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
+        console.log(photos)
+
+        document.getElementById('mainLink').value = photos[0] || '';
+        document.getElementById('optionalLink1').value = photos[1] || '';
+        document.getElementById('optionalLink2').value = photos[2] || '';
+
+
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
+
+
+
+
 
 async function handleFormSubmit(event) {
     event.preventDefault();
@@ -277,7 +515,6 @@ async function handlePostSubmit(event) {
     const tagsInput = document.getElementById("tags").value.trim();
     const mainLink = document.getElementById("mainLink").value.trim();
     const optionalLink1 = document.getElementById("optionalLink1").value.trim();
-    const optionalLink2 = document.getElementById("optionalLink2").value.trim();
 
 
 
@@ -293,7 +530,7 @@ async function handlePostSubmit(event) {
 
     tagList = tagList.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1));
 
-    const photos = [mainLink, optionalLink1, optionalLink2].filter(photo => photo);
+    const photos = [mainLink, optionalLink1].filter(photo => photo);
 
     const createPostDTO = {
         description: description,
@@ -315,234 +552,21 @@ async function handlePostSubmit(event) {
     return createPostDTO;
 }
 
-async function loadPostData(post) {
+
+
+
+export async function loadDataUserForm() {
     try {
-
-        // Rellenar campos del formulario
-        document.getElementById('postId').value = post.showPostDTO.postid;
-        document.getElementById('description').value = post.showPostDTO.description;
-        const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
-    document.getElementById('tags').value = tags;
-
-    const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
-    console.log(photos)
-
-    document.getElementById('mainLink').value = photos[0] || '';
-    document.getElementById('optionalLink1').value = photos[1] || '';
-    document.getElementById('optionalLink2').value = photos[2] || '';
-
-
-    } catch (error) {
-        console.error('Error cargando post:', error);
-    }
-}
-
-export async function UpdateComment(idPost, newData) {
-    try {
-        const data = await patchData(`comment/${idPost}`, newData);
-
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-
-export async function deleteComment(idComment) {
-    try {
-        const data = await deleteData(`comment/${idComment}`);
-
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-
-export async function likedPost(email, idPost) {
-    if (!email) return;
-    try {
-        const data = await postData(`like/likepost/${email}/${idPost}`);
-
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-
-export async function unlikedPost(idLike) {
-    try {
-        const data = await deleteData(`like/${idLike}`);
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-export async function likedComment(email, idPost) {
-    if (!email) return;
-    try {
-        const data = await postData(`like/likecomment/${email}/${idPost}`);
-
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-
-export async function unlikeComment(idLike) {
-    try {
-        const data = await deleteData(`like/${idLike}`);
-
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-
-
-export async function loadMyPost(email) {
-    if (!email) return;
-    try {
-        const data = await fetchData(`post/user/${email}`);
-
-        if (data) {
-            document.getElementById('main-container').innerHTML = '';
-            data.forEach((post, index) => renderPost(post, index));
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (user) {
+            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
+            document.getElementById("name").value = user.name || '';
+            document.getElementById("biography").value = user.biography || '';
         }
     } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
+        console.log(error)
     }
 }
-
-export async function loadLikePost(email) {
-    if (!email) return;
-
-    try {
-        const data = await fetchData(`post/liked/${email}`);
-        if (data) {
-            document.getElementById('follows-container').innerHTML = "";
-            document.getElementById('main-container').innerHTML = "";
-            data.forEach((post, index) => renderPost(post, index));
-        }
-    } catch (error) {
-        console.error('Error al cargar las publicaciones que le gustaron al usuario:', error);
-    }
-}
-
-
-export async function loadTags() {
-    const data = await fetchData('tag/tagDTO');
-    if (data) {
-        const sortedTags = data.sort((a, b) => b.count - a.count);
-        sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
-    }
-}
-
-export async function loadFollowers(userName) {
-    try {
-        const data = await fetchData(`follow/followers/${userName}`);
-
-        if (data) {
-            document.getElementById('follows-container').innerHTML = "";
-            document.getElementById('main-container').innerHTML = "";
-            data.forEach((user, index) => renderUsers(user, index));
-        }
-    } catch (error) {
-        console.error('Error al cargar los seguidores:', error);
-    }
-}
-
-
-export async function loadFollowing(userName) {
-    try {
-        const data = await fetchData(`follow/following/${userName}`);
-        if (data) {
-            document.getElementById('main-container').innerHTML = "";
-            document.getElementById('follows-container').innerHTML = "";
-            data.forEach((user) => renderUsers(user));
-        }
-    } catch (error) {
-        console.error('Error al cargar los seguidos:', error);
-    }
-}
-
-export async function loadgallery(email) {
-    try {
-        const data = await fetchData(`photo/user/${email}`);
-        if (data) {
-            document.getElementById('main-container').innerHTML = "";
-            document.getElementById('follows-container').innerHTML = "";
-            console.log(data);
-
-
-            const galleryContainer = document.createElement('div');
-            galleryContainer.classList.add('gallery-grid');
-
-            data.forEach(image => {
-                const imgElement = document.createElement('img');
-                imgElement.src = image.url;
-                imgElement.alt = 'Imagen de la galería';
-                imgElement.classList.add('gallery-img');
-
-                galleryContainer.appendChild(imgElement);
-            });
-
-            document.getElementById('main-container').appendChild(galleryContainer);
-        }
-    } catch (error) {
-        console.error('Error al cargar los seguidos:', error);
-    }
-}
-
-
-
-export async function CheckFollow(userName) {
-    try {
-        const followers = await fetchData(`follow/followers/${userName}`);
-        const following = await fetchData(`follow/following/${userName}`);
-
-        const currentUser = localStorage.getItem('user').userName;
-        const isFollowing = following.some(user => user.userName === currentUser);
-        const isFollowedBy = followers.some(user => user.userName === currentUser);
-
-        return isFollowing && isFollowedBy;
-    } catch (error) {
-        console.error('Error al verificar la relación de seguimiento:', error);
-        return false;
-    }
-}
-
-export async function loadPosts() {
-    try {
-        const data = await fetchData(`post`);
-        if (data) {
-            document.getElementById('main-container').innerHTML = '';
-            data.forEach((post, index) => renderPost(post, index));
-        }
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
-export async function followedPost(email) {
-    try {
-        console.log('Cargando publicaciones de los seguidos...');
-        const data = await fetchData(`post/my/${email}`);
-
-        console.log('Datos obtenidos de seguidos:', data);
-
-        if (data) {
-            document.getElementById('main-container').innerHTML = '';
-            data.forEach((post, index) => renderPost(post, index));
-        }
-    } catch (error) {
-        console.error('Error al cargar las publicaciones del usuario:', error);
-    }
-}
-
 
 export function renderUsers(user) {
     const template = document.getElementById('UserTemplate');
@@ -686,6 +710,83 @@ export function renderComments(comments, container) {
 
 
 
+async function renderNotificsation() {
+    const data = await loadForYouNotificationsByUsername();
+    console.log(data);
+
+    if (data) {
+        document.getElementById('main-container').innerHTML = "";
+        document.getElementById('follows-container').innerHTML = "";
+        document.getElementById('not').innerHTML = "";
+
+        const unreadNotifications = data.filter(element => !element.status);
+
+
+        unreadNotifications.forEach(element => {
+
+            if (element.status === true) {
+                return
+            }
+
+            if (element.tipo === 'Comment') {
+                loadNotificationComment(element);
+            } else if (element.tipo === 'Like') {
+                loadNotificationLike(element);
+            } else if (element.tipo === 'Follow') {
+                loadNotificationfollow(element);
+            }
+        });
+    }
+}
+
+
+
+async function loadNotificationComment(element) {
+    const template = document.getElementById('Noti-comment-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has made you a comment`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+async function loadNotificationLike(element) {
+    const template = document.getElementById('Noti-like-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has made you a Like`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+async function loadNotificationfollow(element) {
+    const template = document.getElementById('Noti-follow-template');
+    const clone = template.content.cloneNode(true);
+    clone.querySelector('#profile-img').src = element.userPhoto;
+    clone.querySelector('#name').textContent = `${element.name} has followed you`;
+    clone.querySelector('#handle').textContent = `@${element.username}`;
+
+    const checkButton = clone.querySelector('#checkButon');
+    checkButton.addEventListener('click', async () => {
+        await changeNotifcationstatus(element.idNotification);
+    });
+
+    document.getElementById('not').appendChild(clone);
+}
+
+
 
 export function renderPost(data, index) {
     if (!data || !data.showPostDTO || !data.showPostDTO.user) return;
@@ -716,6 +817,7 @@ export function renderPost(data, index) {
         commentSection.classList.toggle('hidden');
         if (!commentSection.classList.contains('hidden')) {
             renderComments(data.commentDTO, commentSection);
+
         }
     });
 
@@ -830,21 +932,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     var modal = document.getElementById("myModal");
-    var openModal = document.getElementById("openModal");
+    var modaledit = document.getElementById("ModalEdit");
 
-    openModal.addEventListener('click', function () {
-        modal.style.display = "block";
-    });
+    var openModal = document.getElementById("openModal");
+    var openModaledit = document.getElementById("openprofilemodal");
+
+    if (openModal) {
+        openModal.addEventListener('click', function () {
+            modal.style.display = "block";
+        });
+    } else {
+        console.error("Error: No se encontró el botón de abrir modal.");
+    }
+
+    if (openModaledit) {
+        openModaledit.addEventListener('click', function () {
+            modaledit.style.display = "block";
+        });
+    } else {
+        console.error("Error: No se encontró el botón de abrir modal edit.");
+    }
 
     var span = document.getElementsByClassName("close")[0];
+    var spanedit = document.getElementsByClassName("closeedit")[0];
 
-    span.addEventListener('click', function () {
-        modal.style.display = "none";
-    });
 
+    if (span) {
+        span.addEventListener('click', function () {
+            modal.style.display = "none";
+        });
+    } else {
+        console.error("Error: No se encontró el elemento para cerrar el modal.");
+    }
+
+
+    if (spanedit) {
+        span.addEventListener('click', function () {
+            modaledit.style.display = "none";
+        });
+    } else {
+        console.error("Error: No se encontró el elemento para cerrar el modal.");
+    }
     window.addEventListener('click', function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
+            modaledit.style.display = "none";
         }
     });
 
