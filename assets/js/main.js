@@ -1,6 +1,4 @@
-import { loadUserProfile } from './Profile.js';
 import { timeAgo, fetchData, postData, deleteData, putData, patchData } from './utils.js';
-
 const currentUser = JSON.parse(localStorage.getItem('user'))
 
 
@@ -358,9 +356,6 @@ async function updatePost(postId, updatePostDTO) {
     try {
         const response = await putData(`post/${postId}`, updatePostDTO);
 
-        if (!response.ok) {
-            throw new Error('Update post failed');
-        }
         return response;
     } catch (error) {
         console.error('Error updating post:', error);
@@ -386,6 +381,9 @@ export async function loadMyPost(email) {
     if (!email) return;
     try {
         const data = await fetchData(`post/user/${email}`);
+
+        console.log(data)
+        console.log(email)
 
         if (data) {
             document.getElementById('main-container').innerHTML = '';
@@ -459,7 +457,7 @@ export function renderComments(comments, container) {
         clone.querySelector('#hour').textContent = timeAgo(data.createDate);
 
         clone.querySelector('#name').addEventListener('click', () => {
-            handleUserClick(userName);
+            handleUserClick(data);
         });
 
         if (currentUser.userName === data.userName) {
@@ -853,6 +851,7 @@ async function handlePostSubmit(event) {
     };
 
     if (postId) {
+        console.log(createPostDTO)
         await updatePost(postId, createPostDTO);
     } else {
         await createPost(createPostDTO);
@@ -873,6 +872,7 @@ async function loadPostData(post) {
 
         document.getElementById('postId').value = post.showPostDTO.postid;
         document.getElementById('description').value = post.showPostDTO.description;
+        console.log(post.tagDTO)
         const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
         document.getElementById('tags').value = tags;
 
@@ -927,217 +927,282 @@ const mainContainer = document.getElementById('main-container');
 
 
 
+// ==============================================
+// Funciones para actualizar el perfil y estadísticas
+// ==============================================
 
-document.addEventListener('DOMContentLoaded', () => {
-
-    const form = document.getElementById("myForm");
-
-    if (form) {
-        form.addEventListener("submit", handlePostSubmit);
-        console.log("Formulario encontrado y evento añadido.");
+const updateUserProfile = (user) => {
+    // Busca los elementos del perfil en el DOM y verifica que existan
+    const nameEl = document.getElementById('name');
+    const userNameEl = document.getElementById('userName');
+    const biographyEl = document.getElementById('biography');
+    const photoEl = document.getElementById('photo');
+    const buttonContainer = document.querySelector('.button-settings');
+  
+    if (!nameEl || !userNameEl || !biographyEl || !photoEl || !buttonContainer) {
+      console.error('Uno o más elementos del perfil no se encontraron en el DOM.');
+      return;
+    }
+  
+    nameEl.textContent = user.name;
+    userNameEl.textContent = `@${user.userName}`;
+    biographyEl.textContent = user.biography;
+    photoEl.src = user.photo;
+  
+    buttonContainer.innerHTML = '';
+    if (user.userName === currentUser.userName) {
+      const editButton = document.createElement('button');
+      editButton.textContent = "Editar";
+      editButton.id = 'openprofilemodal';
+      editButton.classList.add('edit-button');
+      editButton.addEventListener('click', () => {
+        console.log('Editar perfil:', user);
+        document.getElementById('ModalEdit').style.display = 'block';
+      });
+      buttonContainer.appendChild(editButton);
     } else {
-        console.error("Error: No se encontró el formulario.");
+      const followButton = document.createElement('button');
+      followButton.textContent = "Seguir";
+      followButton.classList.add('follow-button');
+      followButton.addEventListener('click', () => {
+        console.log('Seguir a usuario:', user);
+        // Aquí puedes llamar a followUser(user.email);
+      });
+      buttonContainer.appendChild(followButton);
     }
-
-
-    if (form) {
-        form.addEventListener("submit", handlePostSubmit);
-        console.log("Formulario encontrado y evento añadido.");
-    } else {
-        console.error("Error: No se encontró el formulario.");
-    }
-
-    var modal = document.getElementById("myModal");
-    var modaledit = document.getElementById("ModalEdit");
-
-    var openModal = document.getElementById("openModal");
-    var openModaledit = document.getElementById("openprofilemodal");
-
-    if (openModal) {
-        openModal.addEventListener('click', function () {
-            modal.style.display = "block";
-        });
-    } else {
-        console.error("Error: No se encontró el botón de abrir modal.");
-    }
-
-    if (openModaledit) {
-        openModaledit.addEventListener('click', function () {
-            modaledit.style.display = "block";
-        });
-    } else {
-        console.error("Error: No se encontró el botón de abrir modal edit.");
-    }
-
-    var span = document.getElementsByClassName("close")[0];
-    var spanedit = document.getElementsByClassName("closeedit")[0];
-
-
-    if (span) {
-        span.addEventListener('click', function () {
-            modal.style.display = "none";
-        });
-    } else {
-        console.error("Error: No se encontró el elemento para cerrar el modal.");
-    }
-
-
-    if (spanedit) {
-        span.addEventListener('click', function () {
-            modaledit.style.display = "none";
-        });
-    } else {
-        console.error("Error: No se encontró el elemento para cerrar el modal.");
-    }
-    window.addEventListener('click', function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-            modaledit.style.display = "none";
-        }
-    });
-
-
-
-
-    const handleUserClick = (email) => {
-        followedPost(email);
-        followedPost(email);
-        loadMyPost(email);
-        loadLikePost(email);
-        loadTags();
-        loadgallery(email)
-
-    };
-
-    const localUser = JSON.parse(localStorage.getItem('user'));
-    if (localUser && localUser.email) {
-        handleUserClick(localUser.email);
-    } else {
-        console.error("No se encontró el usuario local o su email.");
-    }
-
-    renderNotificsation()
-
-    window.addEventListener('load', () => {
-        toggleVisibility(profileContainer, false);
-        toggleVisibility(feedContainer, true);
-        toggleVisibility(notificationsContainer, false)
-
-    });
-
-    if (homeLink) {
-        homeLink.addEventListener('click', () => {
-            toggleVisibility(profileContainer, false);
-            toggleVisibility(feedContainer, true);
-            toggleVisibility(mainContainer, true)
-            toggleVisibility(notificationsContainer, false)
-
-            loadPosts();
-
-        });
-    }
-
-    if (profileLink) {
-        profileLink.addEventListener('click', () => {
-            toggleVisibility(profileContainer, true);
-            toggleVisibility(feedContainer, false);
-            toggleVisibility(notificationsContainer, false)
-            toggleVisibility(mainContainer, true)
-
-            const localUser = JSON.parse(localStorage.getItem('user'));
-            if (localUser && localUser.email) {
-                loadMyPost(localUser.email);
-                loadLikePost(localUser.email);
-            }
-
-        });
-    }
-
-    if (notificationsLink) {
-        notificationsLink.addEventListener('click', () => {
-            toggleVisibility(profileContainer, false);
-            toggleVisibility(feedContainer, false);
-            toggleVisibility(feedContainer, false);
-            toggleVisibility(notificationsContainer, true)
-            toggleVisibility(mainContainer, false)
-            toggleVisibility(searchContainer, false)
-
-
-
-        })
-    }
-
-    if (searchLink) {
-        searchLink.addEventListener('click', () => {
-            toggleVisibility(profileContainer, false);
-            toggleVisibility(feedContainer, false);
-            toggleVisibility(feedContainer, false);
-            toggleVisibility(notificationsContainer, false)
-            toggleVisibility(searchContainer, true)
-            toggleVisibility(mainContainer, false)
-
-        })
-    }
-
-
-});
-
-
-
-const setupButtons = (email) => {
-    const buttons = document.querySelectorAll('.button');
-
-    const handleButtonClick = (button) => {
-        buttons.forEach(btn => btn.classList.remove('selected'));
-        button.classList.add('selected');
-    };
-
-    buttons.forEach(button => {
-        button.addEventListener('click', () => handleButtonClick(button));
-    });
-
-    const forYouButton = document.querySelector('#recomend-button');
-    const followersButton = document.querySelector('#following-button');
-
-    const loadForYouPosts = () => {
-        handleButtonClick(forYouButton);
-        loadPosts();
-    };
-
-    const loadFollowersPosts = () => {
-        followedPost(email);
-        handleButtonClick(followersButton);
-        
-    };
-
-    if (forYouButton) {
-        forYouButton.addEventListener('click', loadForYouPosts);
-    }
-
-    if (followersButton) {
-        followersButton.addEventListener('click', loadFollowersPosts);
-    }
-
-    if (forYouButton) {
-        loadForYouPosts();
-    }
-};
-
-
-async function handleUserClick(user) {
+  };
+  
+  const updateStats = async (user) => {
     try {
-        await loadUserProfile(user.email);
+      const [posts, followers, following] = await Promise.all([
+        fetchData(`post/user/${user.email}`),
+        fetchData(`follow/followers/${user.userName}`),
+        fetchData(`follow/following/${user.userName}`)
+      ]);
+  
+      // Busca los elementos donde se mostrarán las estadísticas
+      const postsEl = document.getElementById('mypost');
+      const followersEl = document.getElementById('myfollowers');
+      const followingEl = document.getElementById('myfollowed');
+  
+      if (!postsEl || !followersEl || !followingEl) {
+        console.error('Uno o más elementos de estadísticas no se encontraron.');
+        return;
+      }
+  
+      postsEl.textContent = posts.length;
+      followersEl.textContent = followers.length;
+      followingEl.textContent = following.length;
+    } catch (error) {
+      console.error('Error al obtener las estadísticas:', error);
+      showError('Error al obtener los datos.');
+    }
+  };
+  
+  const showError = (message) => {
+    console.error(message);
+  };
+  
+
+  const setupButtons = (userName, email) => {
+    const forYouButton = document.querySelector('.post-button');
+    const likesButton = document.querySelector('.likes-button');
+    const galleryButton = document.querySelector('.photo-button');
+    const followersButton = document.querySelector('#myfollowers');
+    const followingButton = document.querySelector('#myfollowed');
+  
+    if (forYouButton) {
+      forYouButton.onclick = () => {
+        loadMyPost(email);
+      };
+      loadMyPost(email);
+    }
+    if (likesButton) {
+      likesButton.onclick = () => loadLikePost(email);
+    }
+    if (followersButton) {
+      followersButton.onclick = () => loadFollowers(userName);
+    }
+    if (followingButton) {
+      followingButton.onclick = () => loadFollowing(userName);
+    }
+    if (galleryButton) {
+      galleryButton.onclick = () => loadgallery(email);
+    }
+  };
+  
+  export async function loadUserProfile(email) {
+    try {
+      console.log(`Cargando perfil para: ${email}`);
+      const user = await fetchData(`users/${email}`);
+      console.log('Usuario cargado:', user);
+      if (user) {
+        updateUserProfile(user);
+        await updateStats(user);
+        setupButtons(user.userName, user.email);
+      } else {
+        showError('El usuario no se encontró.');
+      }
+    } catch (error) {
+      console.error('Detalle del error en loadUserProfile:', error);
+      showError('Error al cargar el perfil del usuario.');
+    }
+  }
+  
+ 
+  document.addEventListener('DOMContentLoaded', () => {
+    // --- Formularios y modales ---
+    const form = document.getElementById("myForm");
+    if (form) {
+      form.addEventListener("submit", handlePostSubmit);
+      console.log("Formulario encontrado y evento añadido.");
+    } else {
+      console.error("Error: No se encontró el formulario.");
+    }
+  
+    const modal = document.getElementById("myModal");
+    const modaledit = document.getElementById("ModalEdit");
+    const openModal = document.getElementById("openModal");
+    const openModaledit = document.getElementById("openprofilemodal");
+  
+    if (openModal) {
+      openModal.addEventListener('click', () => {
+        modal.style.display = "block";
+      });
+    } else {
+      console.error("Error: No se encontró el botón de abrir modal.");
+    }
+  
+    if (openModaledit) {
+      openModaledit.addEventListener('click', () => {
+        modaledit.style.display = "block";
+      });
+    } else {
+      console.error("Error: No se encontró el botón de abrir modal edit.");
+    }
+  
+    const span = document.getElementsByClassName("close")[0];
+    const spanedit = document.getElementsByClassName("closeedit")[0];
+  
+    if (span) {
+      span.addEventListener('click', () => {
+        modal.style.display = "none";
+      });
+    } else {
+      console.error("Error: No se encontró el elemento para cerrar el modal.");
+    }
+  
+    if (spanedit) {
+      spanedit.addEventListener('click', () => {
+        modaledit.style.display = "none";
+      });
+    } else {
+      console.error("Error: No se encontró el elemento para cerrar el modal edit.");
+    }
+  
+    window.addEventListener('click', (event) => {
+      if (event.target == modal) {
+        modal.style.display = "none";
+        modaledit.style.display = "none";
+      }
+    });
+  
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      let email = urlParams.get('email');
+      const localUser = JSON.parse(localStorage.getItem('user'));
+      if (!email && localUser) {
+        email = localUser.email;
+      }
+      if (email) {
+        loadUserProfile(email);
+        console.log("Perfil cargado para:", email);
+      } else {
+        showError('No se encontró el usuario local o el email proporcionado.');
+      }
+    } catch (error) {
+      console.error("Error al cargar el perfil:", error);
+    }
+  
+    window.handleUserClick = async function (user) {
+      try {
+        console.log("handleUserClick llamado para:", user.email);
         toggleVisibility(profileContainer, true);
         toggleVisibility(feedContainer, false);
+        toggleVisibility(notificationsContainer, false);
+        toggleVisibility(searchContainer, false);
+        toggleVisibility(mainContainer, true);
         toggleVisibility(homeLink, true);
         toggleVisibility(profileLink, true);
+        window.scrollTo(0, 0);
+  
+        // Carga el perfil del usuario clickeado
+        await loadUserProfile(user.email);
+      } catch (error) {
+        console.error("Error al manejar el clic del usuario:", error);
+      }
+    };
+  
+    // --- Cargar perfil del usuario logueado ---
+    const localUser = JSON.parse(localStorage.getItem('user'));
+    if (localUser && localUser.email) {
+      loadUserProfile(localUser.email);
+    } else {
+      console.error("No se encontró el usuario local o su email.");
+    }
+  
+    // --- Renderizar notificaciones ---
+    renderNotificsation();
+  
+    // --- Configuración de visibilidad de secciones ---
+    window.addEventListener('load', () => {
+      toggleVisibility(profileContainer, false);
+      toggleVisibility(feedContainer, true);
+      toggleVisibility(notificationsContainer, false);
+    });
+  
+    // --- Configuración de botones de navegación ---
+    if (homeLink) {
+      homeLink.addEventListener('click', () => {
+        toggleVisibility(profileContainer, false);
+        toggleVisibility(feedContainer, true);
+        toggleVisibility(mainContainer, true);
+        toggleVisibility(notificationsContainer, false);
+        loadPosts();
+      });
+    }
+  
+    if (profileLink) {
+      profileLink.addEventListener('click', () => {
+        toggleVisibility(profileContainer, true);
+        toggleVisibility(feedContainer, false);
         toggleVisibility(notificationsContainer, false);
         toggleVisibility(mainContainer, true);
-        toggleVisibility(searchContainer, false);
-
-        window.scrollTo(0, 0);
-
-    } catch (error) {
-        console.error('Error al manejar el clic del usuario:', error);
+        const localUser = JSON.parse(localStorage.getItem('user'));
+        if (localUser && localUser.email) {
+          loadUserProfile(localUser.email);
+        }
+      });
     }
-}
+  
+    if (notificationsLink) {
+      notificationsLink.addEventListener('click', () => {
+        toggleVisibility(profileContainer, false);
+        toggleVisibility(feedContainer, false);
+        toggleVisibility(notificationsContainer, true);
+        toggleVisibility(mainContainer, false);
+        toggleVisibility(searchContainer, false);
+      });
+    }
+  
+    if (searchLink) {
+      searchLink.addEventListener('click', () => {
+        toggleVisibility(profileContainer, false);
+        toggleVisibility(feedContainer, false);
+        toggleVisibility(notificationsContainer, false);
+        toggleVisibility(searchContainer, true);
+        toggleVisibility(mainContainer, false);
+      });
+    }
+  });
+  

@@ -56,14 +56,10 @@ const showError = (message) => {
     console.error(message);
 };
 
-const handleButtonClick = (button, action) => {
-    const buttons = document.querySelectorAll('.button');
-    buttons.forEach(btn => btn.classList.remove('selected'));
-    button.classList.add('selected');
-    action();
-};
+
 
 const setupButtons = (userName, email) => {
+    
     const forYouButton = document.querySelector('.post-button');
     const likesButton = document.querySelector('.likes-button');
     const gallery = document.querySelector('.photo-button');
@@ -71,33 +67,23 @@ const setupButtons = (userName, email) => {
     const followingButton = document.querySelector('#myfollowed');
 
     if (forYouButton) {
-        forYouButton.addEventListener('click', () =>
-            handleButtonClick(forYouButton, () => loadMyPost(email)));
-    }
-
-    if (likesButton) {
-        likesButton.addEventListener('click', () =>
-            handleButtonClick(likesButton, () => loadLikePost(email)));
-    }
-
-    if (followersButton) {
-        followersButton.addEventListener('click', () =>
-            handleButtonClick(followersButton, () => loadFollowers(userName)));
-    }
-
-    if (followingButton) {
-        followingButton.addEventListener('click', () =>
-            handleButtonClick(followingButton, () => loadFollowing(userName)));
-    }
-
-    if (gallery) {
-        gallery.addEventListener('click', () =>
-            handleButtonClick(gallery, () => loadgallery(email)));
-    }
-
-    if (forYouButton) {
-        handleButtonClick(forYouButton, () => loadMyPost(email));
-    }
+        forYouButton.addEventListener('click', () => loadMyPost(email));
+      }
+      if (likesButton) {
+        likesButton.addEventListener('click', () => loadLikePost(email));
+      }
+      if (followersButton) {
+        followersButton.addEventListener('click', () => loadFollowers(userName));
+      }
+      if (followingButton) {
+        followingButton.addEventListener('click', () => loadFollowing(userName));
+      }
+      if (gallery) {
+        gallery.addEventListener('click', () => loadgallery(email));
+      }
+      if (forYouButton) {
+        loadMyPost(email);
+      }
 };
 
 export async function loadUserProfile(email) {
