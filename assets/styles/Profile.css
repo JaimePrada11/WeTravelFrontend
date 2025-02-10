@@ -54,13 +54,59 @@ main{
 }
 
 
+.user-input {
+    display: flex;
+    align-items: center;
+}
+
+.profile-pic {
+    margin-right: 10px;
+}
+
+.profile-pic img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.comment-text {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    width: auto;
+    transition: border-color 0.3s;
+}
+
+.comment-text:focus {
+    border-color: #007bff;
+}
+
+button[type="submit"] {
+    border: none;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+}
+
 .likebutton{
     color: red !important;
 }
 
 .notification-card {
     display: flex;
-    justify-content: space-between; /* Separa el contenido y el botón */
+    justify-content: space-between; 
     align-items: center;
     border-radius: 16px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -176,15 +222,6 @@ main{
 
 
 
-
-.post-box {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
 .user-input {
     display: flex;
     align-items: center;
@@ -213,10 +250,6 @@ main{
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-
-.user-info {
-    margin-left: 1rem;
-}
 
 .user-name {
     font-weight: 600;
@@ -348,8 +381,8 @@ main{
 .postcard {
     width: 100%;
     margin-bottom: 1rem;
-    max-width: 40rem;
-    padding: 1.5rem;
+    max-width: 50rem;
+    padding: 1rem;
     border-radius: 1.25rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -366,7 +399,6 @@ main{
 .post-header {
     display: flex;
     align-items: center;
-    margin-bottom: 1.5rem;
     justify-content: space-between;
 }
 
@@ -375,15 +407,15 @@ main{
 }
 
 .profile-image {
-    width: 4rem;
-    height: 4rem;
+    width: auto;
+    height: auto;
     object-fit: cover;
     border-radius: 50%;
 }
 
-.user-info {
+.profile-image .user-info {
+    align-content: start;
     margin-left: 1rem;
-    margin-right: auto;
 }
 
 .hour {
@@ -404,7 +436,6 @@ main{
 .hashtags {
     color: rgba(13, 71, 161, 1);
     font-weight: bold;
-    margin-bottom: 0.5rem;
 }
 
 .post-content {
@@ -809,23 +840,9 @@ main{
     border-radius: 6px;
     font-size: 16px;
 }
+¿
 
-.input-group input#profile-pic-url,
-.input-group label[for="profile-pic-url"] {
-    display: none;
-}
 
-.input-group input#profile-pic-url.visible,
-.input-group label[for="profile-pic-url"].visible {
-    display: block;
-}
-
-.input-group input#new-password,
-.input-group input#repeat-password,
-.input-group label[for="new-password"],
-.input-group label[for="repeat-password"] {
-    display: none;
-}
 
 .input-group input.visible,
 .input-group label.visible {
@@ -907,6 +924,7 @@ main{
 
 .user-info {
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -1046,7 +1064,7 @@ main{
     font-weight: bold;
 }
 
-/* .comment-container {
+.comment-container {
     background-color: #fff;
     border: 1px solid #e1e8ed;
     border-radius: 8px;
@@ -1070,109 +1088,56 @@ main{
     object-fit: cover;
 }
 
-.user-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.name {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0;
-}
-
-.handle {
-    font-size: 14px;
-    color: #657786;
-    margin: 0;
-}
-
-#hour {
-    font-size: 12px;
-    color: #657786;
-    margin-left: auto;
-}
-
-.comment-text {
-    font-size: 15px;
-    line-height: 1.5;
-    margin: 2px 0;
-}
-
-.comment-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    border-top: 1px solid #e1e8ed;
-    padding-top: 10px;
-}
-
-.like-section {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: #e0245e;
-    margin-right: 20px;
-}
-
-.like-icon, .comment-icon, .share-icon {
-    margin-right: 5px;
-    font-size: 20px;
-}
-
-#likes {
-    font-size: 14px;
-}
 
 
 
-.comment-box {
-    padding: 15px;
-    max-width: 600px;
-    width: 100%;
-}
-
-.user-input-comment {
-    display: flex;
-    align-items: center; 
+.profile-pic {
+    margin-right: 10px;
 }
 
 .profile-pic img {
-    width: 48px;
-    height: 48px;
     border-radius: 50%;
-    margin-right: 10px;
-    object-fit: cover;
-    display: block;
+    width: 50px;
+    height: 50px;
 }
 
-.comment-text-new {
-    flex: 1;
-    padding: 10px;
+
+.comment-box {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    background: #fff;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.comment-text {
+    width: 100%;
     border: 1px solid #ccc;
     border-radius: 10px;
+    padding: 10px;
     font-size: 14px;
     resize: none;
-    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s;
 }
 
-.comment-text::placeholder {
-    color: #657786;
+.comment-text:focus {
+    border-color: #007bff;
 }
 
-button {
-    background-color: #1da1f2;
-    color: #fff;
+input[type="submit"] {
     border: none;
-    border-radius: 20px;
-    padding: 10px 15px;
-    font-size: 14px;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-left: 10px; /* Espacio entre el textarea y el botón 
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0d8bda;
-} */
+input[type="submit"]:hover {
+    background: #0056b3;
+}

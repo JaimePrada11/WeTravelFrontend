@@ -264,11 +264,11 @@
                     </a>
                 </li>
 
-                <li class="nav-item" id="search-link">
+                <li class="nav-item hidden" id="search-link">
                     <ion-icon class="icon" name="search"></ion-icon> Search
                 </li>
-                <li class="nav-item" id="notifications-link">
-                    <ion-icon class="icon" name="notifications"></ion-icon> Notifications
+                <li class="nav-item " id="notifications-link">
+                    <ion-icon class="icon " name="notifications"></ion-icon> Notifications
                 </li>
                 <li class="nav-item" id="logout-button">
                     <a href="../Index.html">
@@ -382,7 +382,7 @@
             <div class="results" id="results">
             </div>
         </div>
-        
+
 
 
 
@@ -397,9 +397,7 @@
 
     <aside class="sidebar-right">
         <div id="content-container" class="content-container">
-            <div id="seguidores" class="section">
-                <h1>Sugerencias</h1>
-            </div>
+
             <div>
                 <h1 class="titletendencias">Tendencias</h1>
                 <div id="tendencias" class="section">
@@ -459,31 +457,26 @@
                         <p class="text-settings">Configura los ajustes de tu cuenta</p>
                     </div>
                     <div class="settings-form">
-                        <form class="form">
+                        <form class="updateProfileForm" id="updateProfileForm">
                             <div class="personal-info">
-                                <div class="profile-pic">
-                                    <img id="current-profile-pic"
-                                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s"
-                                        alt="Foto de Perfil">
-                                    <button type="button" class="remove-pic" onclick="toggleInput()">x</button>
-                                </div>
-                                <div class="input-group">
-                                    <label for="profile-pic-url" class="hidden">URL de la nueva foto de perfil:</label>
-                                    <input type="text" id="profile-pic-url" class="hidden"
-                                        placeholder="Introduce la URL de tu nueva foto de perfil"
-                                        oninput="updateProfilePic()">
-                                </div>
+
+
                                 <h1>Datos Personales</h1>
+
+                                <div class="input-group">
+                                    <label for="profile-pic-url">URL de la nueva foto de perfil:</label>
+                                    <input type="text" id="profile-pic-url">
+                                </div>
                                 <div class="input-group">
                                     <label for="name">Nombre:</label>
-                                    <input type="text" id="name">
+                                    <input type="text" id="profilename">
                                 </div>
                                 <div class="input-group">
                                     <label for="biography">biography:</label>
-                                    <input type="text" id="biography">
+                                    <input type="text" id="profilebiography">
                                 </div>
                             </div>
-                            
+
                             <button class="update-button">Actualizar Perfil</button>
                         </form>
                     </div>
