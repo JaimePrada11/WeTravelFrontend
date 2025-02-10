@@ -226,13 +226,11 @@ export async function CommentPost(idPost, comment) {
 }
 
 // Actualizar Comentario
-export async function UpdateComment(idPost, newData) {
+export async function UpdateComment(idComent, newData) {
     try {
-        const data = await patchData(`comment/${idPost}`, newData);
+        const data = await putData(`comment/${idComent}`, newData);
 
-        if (!data.ok) {
-            throw new Error('Error al actualizar comentario');
-        }
+        
         return data
 
 
@@ -445,195 +443,15 @@ export async function followedPost(email) {
 
 
 
+// RENDERIZACIONES
 
-
-
-
-async function loadPostData(post) {
-    try {
-
-        // Rellenar campos del formulario
-        document.getElementById('postId').value = post.showPostDTO.postid;
-        document.getElementById('description').value = post.showPostDTO.description;
-        const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
-        document.getElementById('tags').value = tags;
-
-        const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
-        console.log(photos)
-
-        document.getElementById('mainLink').value = photos[0] || '';
-        document.getElementById('optionalLink1').value = photos[1] || '';
-        document.getElementById('optionalLink2').value = photos[2] || '';
-
-
-    } catch (error) {
-        console.error('Error cargando post:', error);
-    }
-}
-
-
-
-
-
-async function handleFormSubmit(event) {
-    event.preventDefault();
-
-    const commentForm = event.target;
-    const content = commentForm.querySelector(".comment-text").value.trim();
-    const postId = commentForm.dataset.postId;
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-
-    if (!content) {
-        console.warn("Error: Faltan datos para publicar el comentario.");
-        return;
-    }
-
-    try {
-        console.log(description.dataset.commentId)
-        if (description.dataset.commentId) {
-            await UpdateComment(description.dataset.commentId, content);
-        } else {
-            await CommentPost(currentUser.email, postId, content);
-        }
-
-        loadMyPost()
-
-        document.getElementById("description").value = "";
-    } catch (error) {
-        console.error("Error al manejar el comentario:", error);
-    }
-
-    commentForm.querySelector(".comment-text").value = "";
-
-}
-
-
-async function handlePostSubmit(event) {
-    event.preventDefault();
-    const postId = document.getElementById("postId").value; // Obtenemos el ID del post
-    const description = document.getElementById("description").value.trim();
-    const tagsInput = document.getElementById("tags").value.trim();
-    const mainLink = document.getElementById("mainLink").value.trim();
-    const optionalLink1 = document.getElementById("optionalLink1").value.trim();
-
-
-
-    if (!description) {
-        console.warn("Error: Faltan campos obligatorios.");
-        return;
-    }
-
-
-    let tagList = tagsInput.split("#")
-        .map(tag => tag.trim().toLowerCase())
-        .filter(tag => tag);
-
-    tagList = tagList.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1));
-
-    const photos = [mainLink, optionalLink1].filter(photo => photo);
-
-    const createPostDTO = {
-        description: description,
-        listTag: tagList,
-        listPhoto: photos
-    };
-
-    if (postId) {
-        await updatePost(postId, createPostDTO);
-    } else {
-        await createPost(createPostDTO);
-    }
-
-    event.target.reset();
-    document.getElementById("postId").value = '';
-    console.log("Datos enviados:", createPostDTO);
-
-
-    return createPostDTO;
-}
-
-
-
-
-export async function loadDataUserForm() {
-    try {
-        const user = JSON.parse(localStorage.getItem('user'))
-        if (user) {
-            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
-            document.getElementById("name").value = user.name || '';
-            document.getElementById("biography").value = user.biography || '';
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export function renderUsers(user) {
-    const template = document.getElementById('UserTemplate');
-
-    const clone = template.content.cloneNode(true);
-
-    clone.querySelector('#photo').src = user.photo;
-    clone.querySelector('#username').textContent = `@${user.userName}`;
-    clone.querySelector('#name').textContent = user.name;
-    clone.querySelector('#bio').textContent = user.biography;
-    const followButton = clone.querySelector('#follow');
-
-    const currentUser = JSON.parse(localStorage.getItem('user'))?.userName;
-
-    if (currentUser) {
-        const result = CheckFollow(user.userName);
-
-        if (result.isFollowing) {
-            followButton.textContent = "Unfollow";
-        } else if (result.isFollowedBy) {
-            followButton.textContent = "Follow";
-        } else {
-            followButton.textContent = "Follow";
-        }
-    }
-
-    clone.querySelector('#name').addEventListener('click', () => {
-        handleUserClick(user);
-    });
-
-
-    document.getElementById('main-container').appendChild(clone);
-}
-
-function toggleVisibility(element, show) {
-    if (element) {
-        if (show) {
-            element.classList.remove('hidden');
-        } else {
-            element.classList.add('hidden');
-        }
-    } else {
-        console.error("Elemento no encontrado:", element);
-    }
-}
-
-
-
-const profileContainer = document.getElementById('profile-container');
-const feedContainer = document.getElementById('feed-container');
-const notificationsContainer = document.getElementById('notifications-container');
-const homeLink = document.getElementById('home-link');
-const profileLink = document.getElementById('profile-link');
-const notificationsLink = document.getElementById('notifications-link');
-const searchLink = document.getElementById('search-link');
-const searchContainer = document.getElementById('search-container');
-const mainContainer = document.getElementById('main-container');
-
-
+// Cargar los comentarios
 export function renderComments(comments, container) {
-    console.log("Comentarios recibidos:", comments);
     container.innerHTML = "";
 
     comments.forEach(data => {
         const template = document.getElementById('comments');
         const clone = template.content.cloneNode(true);
-        const currentUser = JSON.parse(localStorage.getItem('user'));
 
         clone.querySelector('#profile-pic').src = data.userProfilePhoto;
         clone.querySelector('#handle').textContent = `@${data.userName}`;
@@ -650,7 +468,7 @@ export function renderComments(comments, container) {
             editButton.textContent = "Editar";
             editButton.classList.add('edit-button');
             editButton.addEventListener('click', () => {
-                UpdateComment(data.idComment, data.content);
+                openEditCommentModal(data.idComment, data.content);
             });
 
             const deleteButton = document.createElement('button');
@@ -658,6 +476,7 @@ export function renderComments(comments, container) {
             deleteButton.classList.add('delete-button');
             deleteButton.addEventListener('click', async () => {
                 await deleteComment(data.idComment);
+                await loadPosts()
 
             });
 
@@ -708,8 +527,20 @@ export function renderComments(comments, container) {
     });
 }
 
+function openEditCommentModal(commentId, content) {
+    document.getElementById("commentModal").style.display = "block";
+    document.getElementById("comment").value = content; 
+    document.getElementById("commentForm").dataset.idComment = commentId; 
+}
+
+document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("commentModal").style.display = "none";
+    document.getElementById("commentForm").reset();
+    delete document.getElementById("commentForm").dataset.idComment; 
+});
 
 
+//Notificaciones
 async function renderNotificsation() {
     const data = await loadForYouNotificationsByUsername();
     console.log(data);
@@ -739,8 +570,7 @@ async function renderNotificsation() {
     }
 }
 
-
-
+// Notificaciones de comentarios
 async function loadNotificationComment(element) {
     const template = document.getElementById('Noti-comment-template');
     const clone = template.content.cloneNode(true);
@@ -756,6 +586,7 @@ async function loadNotificationComment(element) {
     document.getElementById('not').appendChild(clone);
 }
 
+// Notificaciones de likes
 async function loadNotificationLike(element) {
     const template = document.getElementById('Noti-like-template');
     const clone = template.content.cloneNode(true);
@@ -771,6 +602,7 @@ async function loadNotificationLike(element) {
     document.getElementById('not').appendChild(clone);
 }
 
+// Notificaciones de seguidores
 async function loadNotificationfollow(element) {
     const template = document.getElementById('Noti-follow-template');
     const clone = template.content.cloneNode(true);
@@ -787,7 +619,7 @@ async function loadNotificationfollow(element) {
 }
 
 
-
+// Cargar post
 export function renderPost(data, index) {
     if (!data || !data.showPostDTO || !data.showPostDTO.user) return;
     const template = document.getElementById('post-template');
@@ -864,7 +696,7 @@ export function renderPost(data, index) {
                 await unlikedPost(userLike.idLike);
                 likeButton.setAttribute('name', 'heart-outline');
             } else {
-                await likedPost(currentUser.email, postDTO.postid);
+                await likedPost(postDTO.postid);
                 likeButton.setAttribute('name', 'heart');
             }
             await loadPosts();
@@ -872,8 +704,6 @@ export function renderPost(data, index) {
             console.error('Error al manejar el like/dislike:', error);
         }
     });
-
-
 
 
     if (user.userName === currentUser.userName) {
@@ -910,6 +740,7 @@ export function renderPost(data, index) {
     document.getElementById('main-container').appendChild(fragment);
 }
 
+// Renderizar los tags
 export function renderTags(data) {
     const template = document.getElementById('tags-template');
     const clone = template.content.cloneNode(true);
@@ -920,9 +751,194 @@ export function renderTags(data) {
     document.getElementById('tendencias').appendChild(clone);
 }
 
+// Cargar los usuarios
+export function renderUsers(user) {
+    const template = document.getElementById('UserTemplate');
+
+    const clone = template.content.cloneNode(true);
+
+    clone.querySelector('#photo').src = user.photo;
+    clone.querySelector('#username').textContent = `@${user.userName}`;
+    clone.querySelector('#name').textContent = user.name;
+    clone.querySelector('#bio').textContent = user.biography;
+    const followButton = clone.querySelector('#follow');
+
+    if (currentUser) {
+        const result = CheckFollow(user.userName);
+
+        if (result.isFollowing) {
+            followButton.textContent = "Unfollow";
+        } else if (result.isFollowedBy) {
+            followButton.textContent = "Follow";
+        } else {
+            followButton.textContent = "Follow";
+        }
+    }
+
+    clone.querySelector('#name').addEventListener('click', () => {
+        handleUserClick(user);
+    });
+
+    document.getElementById('main-container').appendChild(clone);
+}
+
+
+
+// FORMULARIOS
+
+// Formulario de comentarios
+async function handleFormSubmit(event) {
+    event.preventDefault();
+
+    const commentForm = event.target;
+    const content = commentForm.querySelector(".comment-text").value.trim();
+    const postId = commentForm.dataset.postId;
+    const commentId = commentForm.dataset.idComment;
+
+
+    if (!content) {
+        console.warn("Error: Faltan datos para publicar el comentario.");
+        return;
+    }
+
+    try {
+        if (commentId) {
+            await UpdateComment(commentId, content);  
+        } else {
+            await CommentPost(postId, content);
+        }
+
+        loadMyPost();
+        document.getElementById("commentModal").style.display = "none";
+        document.getElementById("description").value = "";
+    } catch (error) {
+        console.error("Error al manejar el comentario:", error);
+    }
+
+    delete commentForm.dataset.idComment;
+}
+
+
+document.getElementById("commentForm").addEventListener("submit", handleFormSubmit);
+
+// Formulario de post
+async function handlePostSubmit(event) {
+    event.preventDefault();
+    const postId = document.getElementById("postId").value; 
+    const description = document.getElementById("description").value.trim();
+    const tagsInput = document.getElementById("tags").value.trim();
+    const mainLink = document.getElementById("mainLink").value.trim();
+    const optionalLink1 = document.getElementById("optionalLink1").value.trim();
+
+
+
+    if (!description) {
+        console.warn("Error: Faltan campos obligatorios.");
+        return;
+    }
+
+
+    let tagList = tagsInput.split("#")
+        .map(tag => tag.trim().toLowerCase())
+        .filter(tag => tag);
+
+    tagList = tagList.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1));
+
+    const photos = [mainLink, optionalLink1].filter(photo => photo);
+
+    const createPostDTO = {
+        description: description,
+        listTag: tagList,
+        listPhoto: photos
+    };
+
+    if (postId) {
+        await updatePost(postId, createPostDTO);
+    } else {
+        await createPost(createPostDTO);
+    }
+
+    event.target.reset();
+    document.getElementById("postId").value = '';
+    console.log("Datos enviados:", createPostDTO);
+
+
+    return createPostDTO;
+}
+
+
+
+async function loadPostData(post) {
+    try {
+
+        document.getElementById('postId').value = post.showPostDTO.postid;
+        document.getElementById('description').value = post.showPostDTO.description;
+        const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
+        document.getElementById('tags').value = tags;
+
+        const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
+        console.log(photos)
+
+        document.getElementById('mainLink').value = photos[0] || '';
+        document.getElementById('optionalLink1').value = photos[1] || '';
+
+
+    } catch (error) {
+        console.error('Error cargando post:', error);
+    }
+}
+
+
+export async function loadDataUserForm() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (user) {
+            document.getElementById("current-profile-pic").src = user.photo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGTV9ptpoJ1nv8SE8QJ_A4-pCjnd46axWiA&s";
+            document.getElementById("name").value = user.name || '';
+            document.getElementById("biography").value = user.biography || '';
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+function toggleVisibility(element, show) {
+    if (element) {
+        if (show) {
+            element.classList.remove('hidden');
+        } else {
+            element.classList.add('hidden');
+        }
+    } 
+}
+
+
+
+const profileContainer = document.getElementById('profile-container');
+const feedContainer = document.getElementById('feed-container');
+const notificationsContainer = document.getElementById('notifications-container');
+const homeLink = document.getElementById('home-link');
+const profileLink = document.getElementById('profile-link');
+const notificationsLink = document.getElementById('notifications-link');
+const searchLink = document.getElementById('search-link');
+const searchContainer = document.getElementById('search-container');
+const mainContainer = document.getElementById('main-container');
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById("myForm");
+
+    if (form) {
+        form.addEventListener("submit", handlePostSubmit);
+        console.log("Formulario encontrado y evento añadido.");
+    } else {
+        console.error("Error: No se encontró el formulario.");
+    }
+
 
     if (form) {
         form.addEventListener("submit", handlePostSubmit);
@@ -1065,6 +1081,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
+
+
+
+const setupButtons = (email) => {
+    const buttons = document.querySelectorAll('.button');
+
+    const handleButtonClick = (button) => {
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+    };
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => handleButtonClick(button));
+    });
+
+    const forYouButton = document.querySelector('#recomend-button');
+    const followersButton = document.querySelector('#following-button');
+
+    const loadForYouPosts = () => {
+        handleButtonClick(forYouButton);
+        loadPosts();
+    };
+
+    const loadFollowersPosts = () => {
+        followedPost(email);
+        handleButtonClick(followersButton);
+        
+    };
+
+    if (forYouButton) {
+        forYouButton.addEventListener('click', loadForYouPosts);
+    }
+
+    if (followersButton) {
+        followersButton.addEventListener('click', loadFollowersPosts);
+    }
+
+    if (forYouButton) {
+        loadForYouPosts();
+    }
+};
+
 
 async function handleUserClick(user) {
     try {
