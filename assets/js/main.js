@@ -5,7 +5,6 @@ const currentUser = JSON.parse(localStorage.getItem('user'))
 //Funcion para limpirar el localStorage
 function clearLocalStorage() {
     localStorage.clear();
-    console.log("El localStorage ha sido borrado.");
 }
 
 const logoutButton = document.getElementById('logout-button');
@@ -128,29 +127,15 @@ export async function loadFollowing(userName) {
 async function loadPostTags(tag) {
 
     try {
-        const response = await fetchData(`post/tag/${tag}`);
-
-        if (!response.ok) {
-            throw new Error('Error al obtener los tags');
-        }
-        return response;
+        const posts = await fetchData(`post/tag/${tag}`);
+        return posts;
 
 
     } catch (error) {
         console.error('Error cargando post:', error);
+        return null
     }
 }
-
-// Obtener tag mas usados
-export async function loadTags() {
-    const data = await fetchData('tag/tagDTO');
-    if (data) {
-        const sortedTags = data.sort((a, b) => b.count - a.count);
-        sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
-    }
-}
-
-
 
 //NOTIFICACIONES
 
@@ -208,10 +193,10 @@ export async function loadComment(idComent) {
 }
 
 //Crear un comentario
-export async function CommentPost(idPost, comment) {
+export async function CommentPost(postid, comment) {
 
     try {
-        const data = await postData(`comment/${currentUser.email}/${idPost}`, comment);
+        const data = await postData(`comment/${currentUser.email}/${postid}`, comment);
 
         if (!data.ok) {
             throw new Error('Error al crear comentario');
@@ -256,10 +241,11 @@ export async function deleteComment(idComment) {
 //LIKES
 
 // Dar like a un post
-export async function likedPost( idPost) {
+export async function likedPost(postid) {
     try {
-        const data = await postData(`like/likepost/${currentUser.email}/${idPost}`);
+        const data = await postData(`like/likepost/${currentUser.email}/${postid}`);
 
+        return data
 
     } catch (error) {
         console.error('Error al cargar las publicaciones del usuario:', error);
@@ -271,15 +257,19 @@ export async function unlikedPost(idLike) {
     try {
         const data = await deleteData(`like/${idLike}`);
 
+        return data
+
     } catch (error) {
         console.error('Error al cargar las publicaciones del usuario:', error);
     }
 }
 
 // Dar like a un commentario
-export async function likedComment( idPost) {
+export async function likedComment(idComent) {
     try {
-        const data = await postData(`like/likecomment/${currentUser.email}/${idPost}`);
+        const data = await postData(`like/likecomment/${currentUser.email}/${idComent}`);
+
+        return data
 
 
     } catch (error) {
@@ -307,8 +297,8 @@ export async function loadgallery(email) {
         if (data) {
             document.getElementById('main-container').innerHTML = "";
             document.getElementById('follows-container').innerHTML = "";
-            console.log(data);
 
+            
 
             const galleryContainer = document.createElement('div');
             galleryContainer.classList.add('gallery');
@@ -382,8 +372,6 @@ export async function loadMyPost(email) {
     try {
         const data = await fetchData(`post/user/${email}`);
 
-        console.log(data)
-        console.log(email)
 
         if (data) {
             document.getElementById('main-container').innerHTML = '';
@@ -461,7 +449,6 @@ export function renderComments(comments, container) {
         });
 
         if (currentUser.userName === data.userName) {
-            console.log(currentUser)
             const editButton = document.createElement('button');
             editButton.textContent = "Editar";
             editButton.classList.add('edit-button');
@@ -511,7 +498,7 @@ export function renderComments(comments, container) {
                     await unlikeComment(userLike.idLike);
                     likeButton.setAttribute('name', 'heart-outline');
                 } else {
-                    await likedComment(currentUser.email, data.idComment);
+                    await likedComment(data.idComment);
                     likeButton.setAttribute('name', 'heart');
                 }
                 await loadPosts();
@@ -525,10 +512,10 @@ export function renderComments(comments, container) {
     });
 }
 
-function openEditCommentModal(commentId, content) {
+function openEditCommentModal(idComment, content) {
     document.getElementById("commentModal").style.display = "block";
     document.getElementById("comment").value = content; 
-    document.getElementById("commentForm").dataset.idComment = commentId; 
+    document.getElementById("commentForm").dataset.idComment = idComment; 
 }
 
 document.getElementById("closeModal").addEventListener("click", () => {
@@ -541,7 +528,6 @@ document.getElementById("closeModal").addEventListener("click", () => {
 //Notificaciones
 async function renderNotificsation() {
     const data = await loadForYouNotificationsByUsername();
-    console.log(data);
 
     if (data) {
         document.getElementById('main-container').innerHTML = "";
@@ -627,7 +613,6 @@ export function renderPost(data, index) {
     const postDTO = data.showPostDTO;
     const user = postDTO.user;
 
-    const currentUser = JSON.parse(localStorage.getItem('user'));
 
     clone.querySelector('#photo').src = user.photo;
     clone.querySelector('#name').textContent = user.name;
@@ -687,7 +672,6 @@ export function renderPost(data, index) {
         likeButton.setAttribute('name', 'heart-outline');
     }
 
-
     likeButton.addEventListener('click', async () => {
         try {
             if (userLike) {
@@ -739,7 +723,7 @@ export function renderPost(data, index) {
 }
 
 // Renderizar los tags
-export function renderTags(data) {
+export function renderTagsTendencias(data) {
     const template = document.getElementById('tags-template');
     const clone = template.content.cloneNode(true);
 
@@ -747,6 +731,18 @@ export function renderTags(data) {
     clone.querySelector('#tagstemplateposts').textContent = `${data.count} publicaciones`;
 
     document.getElementById('tendencias').appendChild(clone);
+}
+
+export async function loadTags() {
+    try {
+        const data = await fetchData('tag/tagDTO');
+        if (data && data.length) {
+            const sortedTags = data.sort((a, b) => b.count - a.count);
+            sortedTags.slice(0, 3).forEach(tag => renderTags(tag));
+        }
+    } catch (error) {
+        console.error('Error al cargar los tags:', error);
+    }
 }
 
 // Cargar los usuarios
@@ -851,7 +847,6 @@ async function handlePostSubmit(event) {
     };
 
     if (postId) {
-        console.log(createPostDTO)
         await updatePost(postId, createPostDTO);
     } else {
         await createPost(createPostDTO);
@@ -859,7 +854,6 @@ async function handlePostSubmit(event) {
 
     event.target.reset();
     document.getElementById("postId").value = '';
-    console.log("Datos enviados:", createPostDTO);
 
 
     return createPostDTO;
@@ -872,12 +866,10 @@ async function loadPostData(post) {
 
         document.getElementById('postId').value = post.showPostDTO.postid;
         document.getElementById('description').value = post.showPostDTO.description;
-        console.log(post.tagDTO)
         const tags = post.tagDTO ? post.tagDTO.map(tag => `#${tag.tagContent}`).join(' ') : '';
         document.getElementById('tags').value = tags;
 
         const photos = post.photoDTOurl ? post.photoDTOurl.map(photo => photo.url) : [];
-        console.log(photos)
 
         document.getElementById('mainLink').value = photos[0] || '';
         document.getElementById('optionalLink1').value = photos[1] || '';
@@ -887,6 +879,41 @@ async function loadPostData(post) {
         console.error('Error cargando post:', error);
     }
 }
+
+export async function renderTags(data) {
+    
+    
+    const template = document.getElementById('tags-template');
+    const clone = template.content.cloneNode(true);
+
+    const tagElement = clone.querySelector('#tagstemplatename');
+    tagElement.textContent = `#${data.content}`;
+
+    clone.querySelector('#tagstemplateposts').textContent = `${data.count} publicaciones`;
+
+    tagElement.style.cursor = "pointer";
+
+    tagElement.addEventListener('click', async () => {
+        try {
+            const posts = await loadPostTags(data.content);
+            if (posts && posts.length) {
+                document.getElementById('main-container').innerHTML = "";
+                document.getElementById('follows-container').innerHTML = "";
+
+                posts.forEach((post, index) => {
+                    renderPost(post, index);
+                });
+            } else {
+                console.warn(`No se encontraron posts para el tag: ${data.content}`);
+            }
+        } catch (error) {
+            console.error("Error al cargar posts por tag:", error);
+        }
+    });
+
+    document.getElementById('tendencias').appendChild(clone);
+}
+
 
 
 export async function loadDataUserForm() {
@@ -927,9 +954,6 @@ const mainContainer = document.getElementById('main-container');
 
 
 
-// ==============================================
-// Funciones para actualizar el perfil y estadísticas
-// ==============================================
 
 const updateUserProfile = (user) => {
     // Busca los elementos del perfil en el DOM y verifica que existan
@@ -956,7 +980,6 @@ const updateUserProfile = (user) => {
       editButton.id = 'openprofilemodal';
       editButton.classList.add('edit-button');
       editButton.addEventListener('click', () => {
-        console.log('Editar perfil:', user);
         document.getElementById('ModalEdit').style.display = 'block';
       });
       buttonContainer.appendChild(editButton);
@@ -1033,9 +1056,7 @@ const updateUserProfile = (user) => {
   
   export async function loadUserProfile(email) {
     try {
-      console.log(`Cargando perfil para: ${email}`);
       const user = await fetchData(`users/${email}`);
-      console.log('Usuario cargado:', user);
       if (user) {
         updateUserProfile(user);
         await updateStats(user);
@@ -1051,11 +1072,12 @@ const updateUserProfile = (user) => {
   
  
   document.addEventListener('DOMContentLoaded', () => {
+
+     loadTags();
     // --- Formularios y modales ---
     const form = document.getElementById("myForm");
     if (form) {
       form.addEventListener("submit", handlePostSubmit);
-      console.log("Formulario encontrado y evento añadido.");
     } else {
       console.error("Error: No se encontró el formulario.");
     }
@@ -1116,7 +1138,6 @@ const updateUserProfile = (user) => {
       }
       if (email) {
         loadUserProfile(email);
-        console.log("Perfil cargado para:", email);
       } else {
         showError('No se encontró el usuario local o el email proporcionado.');
       }
@@ -1126,7 +1147,6 @@ const updateUserProfile = (user) => {
   
     window.handleUserClick = async function (user) {
       try {
-        console.log("handleUserClick llamado para:", user.email);
         toggleVisibility(profileContainer, true);
         toggleVisibility(feedContainer, false);
         toggleVisibility(notificationsContainer, false);
